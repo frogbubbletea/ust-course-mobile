@@ -100,7 +100,7 @@ fun CourseCard() {
 
             // Course title
             Text(
-                "Accounting, Business and Society．3 units"
+                "Accounting, Business and Society • 3 units"
             )
 
             Text("9 sections")
