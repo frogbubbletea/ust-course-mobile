@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">USThong</string>
+    <string name="sections_icon_desc">Sections</string>
+    <string name="units_icon_desc">Units</string>
 </resources>
