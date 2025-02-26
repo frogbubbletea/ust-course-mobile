@@ -1,4 +1,4 @@
-package com.example.usthong.ui.theme
+package com.frogbubbletea.usthong.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

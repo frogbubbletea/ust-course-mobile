@@ -1,4 +1,4 @@
-package com.example.usthong
+package com.frogbubbletea.usthong
 
 import org.junit.Test
 

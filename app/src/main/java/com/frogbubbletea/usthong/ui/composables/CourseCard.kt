@@ -1,60 +1,29 @@
-package com.example.usthong
+package com.frogbubbletea.usthong.ui.composables
 
-import android.content.res.Configuration
-import android.graphics.Paint
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text2.input.rememberTextFieldState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.List
-import androidx.compose.material.icons.automirrored.rounded.List
-import androidx.compose.material.icons.rounded.List
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
-import androidx.compose.material3.LocalMinimumTouchTargetEnforcement
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -65,117 +34,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.lerp
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.usthong.ui.theme.USThongTheme
+import com.frogbubbletea.usthong.R
+import com.frogbubbletea.usthong.ui.theme.USThongTheme
 import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            USThongTheme {
-                PrefixScreen("COMP")
-            }
-        }
-    }
-}
-
-// Shows all courses under `prefix`
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun PrefixScreen(prefix: String) {
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            // Shrink top bar title as user scrolls down
-            val topBarCollapsedFraction = scrollBehavior.state.collapsedFraction
-            val topBarTitleTextStyle = lerp(
-                start = MaterialTheme.typography.headlineLarge,
-                stop = MaterialTheme.typography.titleMedium,
-                fraction = topBarCollapsedFraction
-            )
-            val topBarSubtitleTextStyle = lerp(
-                start = MaterialTheme.typography.bodyMedium,
-                stop = MaterialTheme.typography.bodySmall,
-                fraction = topBarCollapsedFraction
-            )
-
-            LargeTopAppBar(
-                title = {
-                    Column(
-                        modifier = Modifier.padding(vertical = 16.dp)
-                    ) {
-                        // Course code prefix
-                        Text(
-                            text = prefix,
-                            style = topBarTitleTextStyle
-                        )
-                        // Full name of course code prefix
-                        Text(
-                            text = "Computer Science and Engineering",
-                            style = topBarSubtitleTextStyle
-                        )
-                    }
-                },
-                actions = {
-                    // Search button
-                    IconButton(
-                        onClick = { }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.material_icon_search),
-                            contentDescription = stringResource(id = R.string.search_icon_desc)
-                        )
-                    }
-
-                    // Sort button
-                    IconButton(
-                        onClick = { }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.material_icon_sort),
-                            contentDescription = stringResource(id = R.string.sort_icon_desc)
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-                ),
-                scrollBehavior = scrollBehavior
-            )
-        }
-    ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(40) { index ->
-                CourseCard()
-            }
-        }
-    }
-}
-
 // Card showing info of a course
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class
+)
 @Composable
 fun CourseCard() {
     // Variables for section selection bottom sheet
@@ -184,6 +56,8 @@ fun CourseCard() {
     val sectionSheetScope = rememberCoroutineScope()
     var showSectionSheet by remember { mutableStateOf(false) }
     var selectedSection by remember { mutableStateOf(sections[0]) }
+
+    //
 
     Surface(
         onClick = { },
@@ -222,9 +96,8 @@ fun CourseCard() {
                         color = Color.Transparent,
                         modifier = Modifier.weight(.3f)
                     ) {
-                        Column(
-//                            verticalArrangement = Arrangement.spacedBy(4.dp),
-                            horizontalAlignment = Alignment.Start
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
                                 text = selectedSection,
@@ -282,9 +155,6 @@ fun CourseCard() {
                                     )
                                 }
                             }
-//                            sections.forEach {
-//
-//                            }
                         }
                     }
                 }
@@ -430,14 +300,14 @@ fun CourseCard() {
                     // Star button
                     IconButton(
                         modifier = Modifier.
-                            then(Modifier.size(28.dp)),
+                        then(Modifier.size(28.dp)),
                         onClick = { }
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.material_icon_star),
                             contentDescription = stringResource(id = R.string.star_icon_desc),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(24.dp)
                         )
                     }
 
@@ -451,7 +321,7 @@ fun CourseCard() {
                             painter = painterResource(R.drawable.material_icon_open_in_browser),
                             contentDescription = stringResource(id = R.string.open_in_ust_icon_desc),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 }
@@ -466,18 +336,5 @@ fun CourseCard() {
 fun CourseCardPreview() {
     USThongTheme {
         CourseCard()
-    }
-}
-
-@Preview(showBackground = true)
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    showBackground = true,
-    name = "Dark Mode"
-)
-@Composable
-fun GreetingPreview() {
-    USThongTheme {
-        PrefixScreen("COMP")
     }
 }
