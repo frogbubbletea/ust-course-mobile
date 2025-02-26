@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text2.input.rememberTextFieldState
@@ -44,6 +45,7 @@ import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.LocalMinimumTouchTargetEnforcement
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -67,8 +69,11 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.lerp
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -81,7 +86,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             USThongTheme {
-                PrefixScreen("ACCT")
+                PrefixScreen("COMP")
             }
         }
     }
@@ -96,9 +101,56 @@ fun PrefixScreen(prefix: String) {
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
+            // Shrink top bar title as user scrolls down
+            val topBarCollapsedFraction = scrollBehavior.state.collapsedFraction
+            val topBarTitleTextStyle = lerp(
+                start = MaterialTheme.typography.headlineLarge,
+                stop = MaterialTheme.typography.titleMedium,
+                fraction = topBarCollapsedFraction
+            )
+            val topBarSubtitleTextStyle = lerp(
+                start = MaterialTheme.typography.bodyMedium,
+                stop = MaterialTheme.typography.bodySmall,
+                fraction = topBarCollapsedFraction
+            )
+
             LargeTopAppBar(
                 title = {
-                    Text(prefix)
+                    Column(
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    ) {
+                        // Course code prefix
+                        Text(
+                            text = prefix,
+                            style = topBarTitleTextStyle
+                        )
+                        // Full name of course code prefix
+                        Text(
+                            text = "Computer Science and Engineering",
+                            style = topBarSubtitleTextStyle
+                        )
+                    }
+                },
+                actions = {
+                    // Search button
+                    IconButton(
+                        onClick = { }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.material_icon_search),
+                            contentDescription = stringResource(id = R.string.search_icon_desc)
+                        )
+                    }
+
+                    // Sort button
+                    IconButton(
+                        onClick = { }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.material_icon_sort),
+                            contentDescription = stringResource(id = R.string.sort_icon_desc)
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
@@ -127,7 +179,7 @@ fun PrefixScreen(prefix: String) {
 @Composable
 fun CourseCard() {
     // Variables for section selection bottom sheet
-    val sections = listOf("L1 (1001)", "L2 (1002)", "L3 (1003)", "L4 (1004)", "L5 (1005)", "L6 (1006)", "L7 (1007)", "L8 (1008)", "L9 (1009)")
+    val sections = listOf("L1 (1001)", "L2 (1002)", "L3 (1003)", "L4 (1004)", "L5 (1005)", "L06 (1006)", "L07 (1007)", "L08 (1008)", "L09 (1009)", "L10 (1010)", "L11 (1011)", "T01B (1234)", "T02C (1145)", "T05A (3555)")
     val sectionSheetState = rememberModalBottomSheetState()
     val sectionSheetScope = rememberCoroutineScope()
     var showSectionSheet by remember { mutableStateOf(false) }
@@ -167,11 +219,12 @@ fun CourseCard() {
                 ) {
                     Surface(
                         onClick = { showSectionSheet = true },
-                        color = Color.Transparent
+                        color = Color.Transparent,
+                        modifier = Modifier.weight(.3f)
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                        Column(
+//                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                            horizontalAlignment = Alignment.Start
                         ) {
                             Text(
                                 text = selectedSection,
@@ -207,33 +260,38 @@ fun CourseCard() {
                         Spacer(modifier = Modifier.height(16.dp))
 
                         // Add sections to the sheet one by one
-                        sections.forEach {
-                            Surface(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                color = if (it == selectedSection) MaterialTheme.colorScheme.surfaceContainerHigh else Color.Transparent,
-                                onClick = {
-                                    selectedSection = it
-                                    sectionSheetScope.launch { sectionSheetState.hide() }.invokeOnCompletion {
-                                        if (!sectionSheetState.isVisible) {
-                                            showSectionSheet = false
+                        LazyColumn {
+                            items(sections) { section ->
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    color = if (section == selectedSection) MaterialTheme.colorScheme.surfaceContainerHigh else Color.Transparent,
+                                    onClick = {
+                                        selectedSection = section
+                                        sectionSheetScope.launch { sectionSheetState.hide() }.invokeOnCompletion {
+                                            if (!sectionSheetState.isVisible) {
+                                                showSectionSheet = false
+                                            }
                                         }
                                     }
+                                ) {
+                                    Text(
+                                        text = section,
+                                        modifier = Modifier
+                                            .padding(horizontal = 32.dp, vertical = 12.dp)
+                                    )
                                 }
-                            ) {
-                                Text(
-                                    text = it,
-                                    modifier = Modifier
-                                        .padding(horizontal = 32.dp, vertical = 12.dp)
-                                )
                             }
+//                            sections.forEach {
+//
+//                            }
                         }
                     }
                 }
 
                 // "Quota" column
                 Column(
-                    modifier = Modifier.weight(.25f),
+                    modifier = Modifier.weight(.175f),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -243,13 +301,14 @@ fun CourseCard() {
                     Text(
                         text = "120",
                         style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
 
                 // "Enrol" column
                 Column(
-                    modifier = Modifier.weight(.25f),
+                    modifier = Modifier.weight(.175f),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -259,13 +318,14 @@ fun CourseCard() {
                     Text(
                         text = "101",
                         style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
 
                 // "Avail" column
                 Column(
-                    modifier = Modifier.weight(.25f),
+                    modifier = Modifier.weight(.175f),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -275,13 +335,14 @@ fun CourseCard() {
                     Text(
                         text = "19",
                         style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
 
                 // "Wait" column
                 Column(
-                    modifier = Modifier.weight(.25f),
+                    modifier = Modifier.weight(.175f),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
@@ -291,6 +352,7 @@ fun CourseCard() {
                     Text(
                         text = "0",
                         style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
@@ -314,7 +376,7 @@ fun CourseCard() {
                     ) {
                         Row(
                             modifier = Modifier
-                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                                .padding(horizontal = 8.dp, vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
@@ -328,6 +390,8 @@ fun CourseCard() {
 
                             Text(
                                 text = "9 sections",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -340,7 +404,7 @@ fun CourseCard() {
                     ) {
                         Row(
                             modifier = Modifier
-                                .padding(horizontal = 8.dp, vertical = 4.dp),
+                                .padding(horizontal = 8.dp, vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
@@ -354,6 +418,8 @@ fun CourseCard() {
 
                             Text(
                                 text = "3 units",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -412,6 +478,6 @@ fun CourseCardPreview() {
 @Composable
 fun GreetingPreview() {
     USThongTheme {
-        PrefixScreen("ACCT")
+        PrefixScreen("COMP")
     }
 }

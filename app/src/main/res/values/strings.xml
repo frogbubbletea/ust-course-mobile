@@ -5,4 +5,6 @@
     <string name="dropdown_icon_desc">Dropdown</string>
     <string name="star_icon_desc">Star</string>
     <string name="open_in_ust_icon_desc">Open in Class Schedule &amp; Quota</string>
+    <string name="search_icon_desc">Search</string>
+    <string name="sort_icon_desc">Sort</string>
 </resources>
