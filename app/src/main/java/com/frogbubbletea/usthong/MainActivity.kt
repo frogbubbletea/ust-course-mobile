@@ -67,8 +67,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             USThongTheme {
-                // PrefixScreen("COMP")
-                StarredScreen()  // Testing
+                 PrefixScreen("COMP")
+//                StarredScreen()  // Testing
             }
         }
     }

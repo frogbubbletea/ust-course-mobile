@@ -41,7 +41,7 @@ fun PrefixScreen(prefix: String) {
             // Shrink top bar title as user scrolls down
             val topBarCollapsedFraction = scrollBehavior.state.collapsedFraction
             val topBarTitleTextStyle = lerp(
-                start = MaterialTheme.typography.headlineLarge,
+                start = MaterialTheme.typography.headlineMedium,
                 stop = MaterialTheme.typography.titleMedium,
                 fraction = topBarCollapsedFraction
             )

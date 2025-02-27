@@ -30,7 +30,9 @@ fun StarredScreen() {
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeTopAppBar(
-                title = { Text("Starred") },
+                title = {
+                    Text("Starred")
+                },
                 actions = {
                     // Search button
                     IconButton(
