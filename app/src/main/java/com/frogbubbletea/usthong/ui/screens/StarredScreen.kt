@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.lerp
 import androidx.compose.ui.tooling.preview.Preview
 import com.frogbubbletea.usthong.R
 import com.frogbubbletea.usthong.ui.composables.CourseList
@@ -29,9 +30,20 @@ fun StarredScreen() {
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
+            // Shrink top bar title as user scrolls down
+            val topBarCollapsedFraction = scrollBehavior.state.collapsedFraction
+            val topBarTitleTextStyle = lerp(
+                start = MaterialTheme.typography.headlineMedium,
+                stop = MaterialTheme.typography.titleLarge,
+                fraction = topBarCollapsedFraction
+            )
+
             LargeTopAppBar(
                 title = {
-                    Text("Starred")
+                    Text(
+                        text = "Starred",
+                        style = topBarTitleTextStyle
+                    )
                 },
                 actions = {
                     // Search button
