@@ -56,6 +56,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.R
 import com.frogbubbletea.usthong.ui.composables.CourseCard
+import com.frogbubbletea.usthong.ui.screens.CourseScreen
 import com.frogbubbletea.usthong.ui.screens.PrefixScreen
 import com.frogbubbletea.usthong.ui.screens.StarredScreen
 import com.frogbubbletea.usthong.ui.theme.USThongTheme
@@ -67,8 +68,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             USThongTheme {
-                 PrefixScreen("COMP")
-//                StarredScreen()  // Testing
+                PrefixScreen("COMP")
             }
         }
     }
