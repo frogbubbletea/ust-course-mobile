@@ -1,12 +1,6 @@
 package com.frogbubbletea.usthong.ui.screens
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,53 +15,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.lerp
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.R
-import com.frogbubbletea.usthong.ui.composables.CourseCard
 import com.frogbubbletea.usthong.ui.composables.CourseList
 import com.frogbubbletea.usthong.ui.theme.USThongTheme
 
-// Shows all courses under a certain prefix
+// Shows all courses starred by the user
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrefixScreen(prefix: String) {
+fun StarredScreen() {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            // Shrink top bar title as user scrolls down
-            val topBarCollapsedFraction = scrollBehavior.state.collapsedFraction
-            val topBarTitleTextStyle = lerp(
-                start = MaterialTheme.typography.headlineLarge,
-                stop = MaterialTheme.typography.titleMedium,
-                fraction = topBarCollapsedFraction
-            )
-            val topBarSubtitleTextStyle = lerp(
-                start = MaterialTheme.typography.bodyMedium,
-                stop = MaterialTheme.typography.bodySmall,
-                fraction = topBarCollapsedFraction
-            )
-
             LargeTopAppBar(
-                title = {
-                    Column(
-                        modifier = Modifier.padding(vertical = 16.dp)
-                    ) {
-                        // Course code prefix
-                        Text(
-                            text = prefix,
-                            style = topBarTitleTextStyle
-                        )
-                        // Full name of course code prefix
-                        Text(
-                            text = "Computer Science and Engineering",
-                            style = topBarSubtitleTextStyle
-                        )
-                    }
-                },
+                title = { Text("Starred") },
                 actions = {
                     // Search button
                     IconButton(
@@ -108,8 +71,8 @@ fun PrefixScreen(prefix: String) {
     name = "Dark Mode"
 )
 @Composable
-fun GreetingPreview() {
+fun StarredPreview() {
     USThongTheme {
-        PrefixScreen("COMP")
+        StarredScreen()
     }
 }
