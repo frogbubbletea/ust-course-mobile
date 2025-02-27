@@ -26,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.R
 import com.frogbubbletea.usthong.ui.composables.CourseCard
+import com.frogbubbletea.usthong.ui.composables.CourseList
 import com.frogbubbletea.usthong.ui.theme.USThongTheme
 
 // Shows all courses under `prefix`
@@ -96,17 +97,18 @@ fun PrefixScreen(prefix: String) {
             )
         }
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(40) { index ->
-                CourseCard()
-            }
-        }
+//        LazyColumn(
+//            modifier = Modifier
+//                .padding(innerPadding)
+//                .fillMaxSize(),
+//            contentPadding = PaddingValues(12.dp),
+//            verticalArrangement = Arrangement.spacedBy(12.dp)
+//        ) {
+//            items(40) { index ->
+//                CourseCard()
+//            }
+//        }
+        CourseList(innerPadding)
     }
 }
 
