@@ -68,7 +68,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             USThongTheme {
-                PrefixScreen("COMP")
+//                PrefixScreen("COMP")
+                CourseScreen()
             }
         }
     }
