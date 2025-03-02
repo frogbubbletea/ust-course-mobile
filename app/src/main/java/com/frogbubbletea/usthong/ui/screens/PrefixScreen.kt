@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,7 +35,7 @@ import com.frogbubbletea.usthong.ui.theme.USThongTheme
 // Shows all courses under a certain prefix
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrefixScreen(prefix: String) {
+fun PrefixScreen() {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         state = rememberTopAppBarState(),
         snapAnimationSpec = null
@@ -42,6 +43,7 @@ fun PrefixScreen(prefix: String) {
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        contentWindowInsets = WindowInsets(bottom = 0.dp),
         topBar = {
             // Shrink top bar title as user scrolls down
 //            val topBarCollapsedFraction = scrollBehavior.state.collapsedFraction
@@ -63,7 +65,7 @@ fun PrefixScreen(prefix: String) {
                     ) {
                         // Course code prefix
                         Text(
-                            text = prefix,
+                            text = "COMP",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Medium
                         )
@@ -116,6 +118,6 @@ fun PrefixScreen(prefix: String) {
 @Composable
 fun GreetingPreview() {
     USThongTheme {
-        PrefixScreen("COMP")
+        PrefixScreen()
     }
 }
