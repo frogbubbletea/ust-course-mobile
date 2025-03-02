@@ -14,9 +14,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,10 +46,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.frogbubbletea.usthong.R
 import com.frogbubbletea.usthong.ui.composables.CourseCard
+import com.frogbubbletea.usthong.ui.composables.SectionCard
 import com.frogbubbletea.usthong.ui.theme.USThongTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,7 +61,10 @@ fun CourseScreen(
     // TODO: Add parameter to this screen to accept a course
 ) {
     // Set top bar to collapse when scrolled down
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
+        state = rememberTopAppBarState(),
+        snapAnimationSpec = null
+    )
 
     Scaffold(
         // Connect content's scroll position to top bar so it can be collapsed
@@ -78,25 +88,18 @@ fun CourseScreen(
                 },
 
                 actions = {
-                    // Reviews button
+                    // Star button
                     IconButton(
                         onClick = { }
                     ) {
                         Icon(
-                            painter = painterResource(R.drawable.material_icon_satellite),
-                            contentDescription = stringResource(id = R.string.reviews_icon_desc)
+                            painter = painterResource(R.drawable.material_icon_star),
+                            contentDescription = stringResource(id = R.string.star_icon_desc)
                         )
                     }
 
-                    // Sort button
-                    IconButton(
-                        onClick = { }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.material_icon_open_in_browser),
-                            contentDescription = stringResource(id = R.string.open_in_ust_icon_desc)
-                        )
-                    }
+                    // Dropdown menu button
+                    ExternalLinksDropdown()
                 },
 
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -115,10 +118,12 @@ fun CourseScreen(
         ) {
             // Course title
             item {
-                Text(
-                    text = "Cultures and Values: Language, Communication and Society",
-                    style = MaterialTheme.typography.titleLarge
-                )
+                SelectionContainer {
+                    Text(
+                        text = "Cultures and Values: Language, Communication and Society",
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                }
             }
 
             // Course attributes
@@ -137,9 +142,51 @@ fun CourseScreen(
                 }
             }
 
+            // Course info
             item {
                 CourseInfoContainer()
             }
+
+            // Sections
+            items(40) {
+                SectionCard()
+            }
+        }
+    }
+}
+
+// Dropdown menu containing external links
+@Composable
+fun ExternalLinksDropdown() {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        IconButton(onClick = { expanded = !expanded }) {
+            Icon(Icons.Default.MoreVert, contentDescription = "More options")
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = "USTSPACE Reviews",
+                        fontWeight = FontWeight.Normal,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                },
+                onClick = { expanded = false }
+            )
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = "Open in Class Schedule & Quota",
+                        fontWeight = FontWeight.Normal,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                },
+                onClick = { expanded = false }
+            )
         }
     }
 }
@@ -152,12 +199,12 @@ fun CourseAttribute(
 ) {
     // Highlight attribute for important ones (matching required)
     val attrBgColor = if (alert) {
-        MaterialTheme.colorScheme.primaryContainer
+        MaterialTheme.colorScheme.tertiaryContainer
     } else {
         MaterialTheme.colorScheme.surfaceContainerHigh
     }
     val attrTextColor = if (alert) {
-        MaterialTheme.colorScheme.onPrimaryContainer
+        MaterialTheme.colorScheme.onTertiaryContainer
     } else {
         MaterialTheme.colorScheme.onSurfaceVariant
     }
@@ -172,7 +219,7 @@ fun CourseAttribute(
             Text(
                 text = attr,
                 style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Medium,
+//                fontWeight = FontWeight.Medium,
                 color = attrTextColor
             )
         }
@@ -188,26 +235,53 @@ fun CourseInfoContainer(
         modifier = Modifier
             .fillMaxWidth(),
         shape = MaterialTheme.shapes.small,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        color = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
-        Column(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth()
-        ) {
+        SelectionContainer {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text(
-                    text = "Description",
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = "This course provides a gentle introduction to artificial intelligence (AI), and emphasizes hands-on practical experiences with Python and AI software tools to explore AI applications. Interesting applications that have been covered in previous class offerings include, but are not limited to, medical diagnosis, predictions of customer behaviour and user attitudes, character recognition, spam mail detection, text and image classifications and recognitions, sentiment analysis, and retinal vessel segmentation. The course also explores recent advances and discusses the history and ethics of AI. Only for students in their first and second year of study or those with approval from instructor by applying requisite waiver.",
-                    style = MaterialTheme.typography.bodySmall
-                )
+                Column {
+                    Text(
+                        text = "Pre-requisite",
+                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = "(Grade B+ or above in COMP 2011 / COMP 2012 / COMP 2012H) AND (grade A- or above in COMP 2711 / COMP 2711H / MATH 2343)",
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+
+                Column {
+                    Text(
+                        text = "Exclusion",
+                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = "COMP 3211, COMP 4211, COMP 4221, COMP 4331, COMP 4332, COMP 4421, COMP 4471, COMP 4901K, COMP 4901L, ELEC 4130, ELEC 4230, EMIA 4110, ISOM 3360, MATH 4336, MATH 4432, RMBI 4310, COMP 5211, COMP 5212, COMP 5213, COMP 5221, COMP 5222, COMP 5215, COMP 5331, COMP 5421",
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+
+                Column {
+                    Text(
+                        text = "Description",
+                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = "This course provides a gentle introduction to artificial intelligence (AI), and emphasizes hands-on practical experiences with Python and AI software tools to explore AI applications. Interesting applications that have been covered in previous class offerings include, but are not limited to, medical diagnosis, predictions of customer behaviour and user attitudes, character recognition, spam mail detection, text and image classifications and recognitions, sentiment analysis, and retinal vessel segmentation. The course also explores recent advances and discusses the history and ethics of AI. Only for students in their first and second year of study or those with approval from instructor by applying requisite waiver.",
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
             }
         }
     }

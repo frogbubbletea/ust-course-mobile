@@ -14,6 +14,7 @@ import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.lerp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,25 +35,28 @@ import com.frogbubbletea.usthong.ui.theme.USThongTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrefixScreen(prefix: String) {
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
+        state = rememberTopAppBarState(),
+        snapAnimationSpec = null
+    )
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             // Shrink top bar title as user scrolls down
-            val topBarCollapsedFraction = scrollBehavior.state.collapsedFraction
-            val topBarTitleTextStyle = lerp(
-                start = MaterialTheme.typography.headlineMedium,
-                stop = MaterialTheme.typography.titleMedium,
-                fraction = topBarCollapsedFraction
-            )
-            val topBarSubtitleTextStyle = lerp(
-                start = MaterialTheme.typography.bodyMedium,
-                stop = MaterialTheme.typography.bodySmall,
-                fraction = topBarCollapsedFraction
-            )
+//            val topBarCollapsedFraction = scrollBehavior.state.collapsedFraction
+//            val topBarTitleTextStyle = lerp(
+//                start = MaterialTheme.typography.headlineMedium,
+//                stop = MaterialTheme.typography.titleMedium,
+//                fraction = topBarCollapsedFraction
+//            )
+//            val topBarSubtitleTextStyle = lerp(
+//                start = MaterialTheme.typography.bodyMedium,
+//                stop = MaterialTheme.typography.bodySmall,
+//                fraction = topBarCollapsedFraction
+//            )
 
-            LargeTopAppBar(
+            TopAppBar(
                 title = {
                     Column(
                         modifier = Modifier.padding(vertical = 16.dp)
@@ -59,12 +64,13 @@ fun PrefixScreen(prefix: String) {
                         // Course code prefix
                         Text(
                             text = prefix,
-                            style = topBarTitleTextStyle
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Medium
                         )
                         // Full name of course code prefix
                         Text(
                             text = "Computer Science and Engineering",
-                            style = topBarSubtitleTextStyle
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 },

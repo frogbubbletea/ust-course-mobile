@@ -19,7 +19,7 @@ fun CourseList(
         modifier = Modifier
             .padding(innerPadding)
             .fillMaxSize(),
-        contentPadding = PaddingValues(12.dp),
+        contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(40) { index ->

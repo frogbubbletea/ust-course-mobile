@@ -8,4 +8,9 @@
     <string name="search_icon_desc">Search</string>
     <string name="sort_icon_desc">Sort</string>
     <string name="reviews_icon_desc">USTSPACE Reviews</string>
+    <string name="datetime_icon_desc">Date &amp; Time</string>
+    <string name="venue_icon_desc">Venue</string>
+    <string name="inst_icon_desc">Instructor</string>
+    <string name="ta_icon_desc">TA/IA/GTA</string>
+    <string name="remarks_icon_desc">Remarks</string>
 </resources>
