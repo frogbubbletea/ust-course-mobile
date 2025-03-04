@@ -27,7 +27,10 @@ import com.frogbubbletea.usthong.ui.theme.USThongTheme
 // Shows all courses starred by the user
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StarredScreen() {
+fun StarredScreen(
+    onNavigateToCourse: () -> Unit = {},
+    onNavigateBack: () -> Unit = {},
+) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         state = rememberTopAppBarState(),
         snapAnimationSpec = null

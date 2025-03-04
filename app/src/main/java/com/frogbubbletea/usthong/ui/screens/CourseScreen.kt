@@ -59,6 +59,8 @@ import com.frogbubbletea.usthong.ui.theme.USThongTheme
 @Composable
 fun CourseScreen(
     // TODO: Add parameter to this screen to accept a course
+
+    onNavigateBack: () -> Unit = {},
 ) {
     // Set top bar to collapse when scrolled down
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
