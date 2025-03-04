@@ -5,8 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.waterfall
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -21,6 +25,7 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,7 +50,15 @@ fun PrefixScreen(
     )
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            // Make window avoid overlapping with display cutout in landscape mode
+            .then(
+                if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE)
+                    Modifier.windowInsetsPadding(WindowInsets.displayCutout)
+                else
+                    Modifier
+            ),
         contentWindowInsets = WindowInsets(bottom = 0.dp),
         topBar = {
             // Shrink top bar title as user scrolls down
@@ -64,7 +77,7 @@ fun PrefixScreen(
             TopAppBar(
                 title = {
                     Column(
-                        modifier = Modifier.padding(vertical = 16.dp)
+//                        modifier = Modifier.padding(vertical = 16.dp)
                     ) {
                         // Course code prefix
                         Text(

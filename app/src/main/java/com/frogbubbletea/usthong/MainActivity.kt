@@ -72,7 +72,8 @@ class MainActivity : ComponentActivity() {
 //                PrefixScreen("COMP")
 //                CourseScreen()
 //                AppScreen()
-                NewNavigation()
+//                NewNavigation()
+                PrefixScreen()
             }
         }
     }

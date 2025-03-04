@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -43,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -70,9 +73,16 @@ fun CourseScreen(
     )
 
     Scaffold(
-        // Connect content's scroll position to top bar so it can be collapsed
         modifier = Modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+            // Connect content's scroll position to top bar so it can be collapsed
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            // Make window avoid overlapping with display cutout in landscape mode
+            .then(
+                if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE)
+                    Modifier.windowInsetsPadding(WindowInsets.displayCutout)
+                else
+                    Modifier
+            ),
         contentWindowInsets = WindowInsets(bottom = 0.dp),
 
         topBar = {
