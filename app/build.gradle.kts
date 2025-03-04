@@ -65,4 +65,11 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:$nav_version")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+
+    implementation("androidx.activity:activity:1.10.1")
+
+    implementation("com.google.android.material:material:1.12.0")
+
+    implementation("androidx.transition:transition-ktx:1.5.1")
+
 }

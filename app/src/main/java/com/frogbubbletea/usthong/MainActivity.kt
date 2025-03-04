@@ -55,7 +55,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.R
-import com.frogbubbletea.usthong.ui.composables.AppScreen
 import com.frogbubbletea.usthong.ui.composables.CourseCard
 import com.frogbubbletea.usthong.ui.composables.NewNavigation
 import com.frogbubbletea.usthong.ui.screens.CourseScreen

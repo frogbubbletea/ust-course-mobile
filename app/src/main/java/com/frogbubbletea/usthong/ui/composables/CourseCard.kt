@@ -19,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
@@ -39,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.R
 import com.frogbubbletea.usthong.ui.theme.USThongTheme
@@ -94,7 +96,7 @@ fun CourseCard(
             ) {
                 // Display of selected section
                 CompositionLocalProvider(
-                    LocalMinimumInteractiveComponentEnforcement provides false,
+                    LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
                 ) {
                     Surface(
                         onClick = { showSectionSheet = true },
@@ -237,7 +239,7 @@ fun CourseCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             CompositionLocalProvider(  // Remove hardcoded padding around button
-                LocalMinimumInteractiveComponentEnforcement provides false,
+                LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
             ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
