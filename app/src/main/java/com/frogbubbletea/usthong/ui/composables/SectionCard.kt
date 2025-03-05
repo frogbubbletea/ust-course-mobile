@@ -46,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.R
+import com.frogbubbletea.usthong.ui.screens.CourseAttribute
 import com.frogbubbletea.usthong.ui.theme.USThongTheme
 import kotlinx.coroutines.launch
 
@@ -83,16 +84,24 @@ fun SectionCard(
 //                ScheduleSelectionMenu()
 //            }
 
-            // Section code
-            Text(
-                text = "L1 (1001)",
-                style = MaterialTheme.typography.titleLarge
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                // Section code
+                Text(
+                    text = "L1 (1001)",
+                    style = MaterialTheme.typography.titleLarge
+                )
 
-            // Remarks
-            Column {
-                RemarksRow("The class is delivered in a real-time online mode")
-                RemarksRow("Instructor Consent Required")
+                // Remarks
+                CompositionLocalProvider(  // Remove hardcoded padding around button
+                    LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
+                ) {
+                    RemarksRow("Mode")
+                    RemarksRow("Consent")
+                }
             }
 
             // Schedule selection menu
@@ -115,20 +124,16 @@ fun RemarksRow(
     // TODO: Add parameter to make it accept remarks
     remark: String
 ) {
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically
+    Surface(
+        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colorScheme.tertiaryContainer,
+        onClick = { }
     ) {
-        Icon(
-            painter = painterResource(R.drawable.material_icon_info),
-            contentDescription = stringResource(id = R.string.remarks_icon_desc),
-            modifier = Modifier.size(16.dp),
-            tint = MaterialTheme.colorScheme.tertiary
-        )
         Text(
             text = remark,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.tertiary
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onTertiaryContainer,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
         )
     }
 }
