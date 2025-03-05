@@ -54,9 +54,7 @@ import kotlinx.coroutines.launch
     ExperimentalMaterial3Api::class
 )
 @Composable
-fun CourseCard(
-    onClick: () -> Unit = {},
-) {
+fun CourseCard() {
     // Variables for section selection bottom sheet
     val sections = listOf("L1 (1001)", "L2 (1002)", "L3 (1003)", "L4 (1004)", "L5 (1005)", "L06 (1006)", "L07 (1007)", "L08 (1008)", "L09 (1009)", "L10 (1010)", "L11 (1011)", "T01B (1234)", "T02C (1145)", "T05A (3555)")
     val sectionSheetState = rememberModalBottomSheetState()

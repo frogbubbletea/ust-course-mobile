@@ -12,8 +12,7 @@ import androidx.compose.ui.unit.dp
 // Format a list of courses into a `LazyColumn` of  `CourseCard`s
 @Composable
 fun CourseList(
-    innerPadding: PaddingValues,
-    onCourseCardClick: () -> Unit = {}
+    innerPadding: PaddingValues
     // TODO: Add parameter to make it accept a list of course data
 ) {
     LazyColumn(
@@ -24,7 +23,7 @@ fun CourseList(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(40) { index ->
-            CourseCard(onClick = onCourseCardClick)
+            CourseCard()
         }
     }
 }

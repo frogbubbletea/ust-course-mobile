@@ -40,10 +40,7 @@ import com.frogbubbletea.usthong.ui.theme.USThongTheme
 // Shows all courses under a certain prefix
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PrefixScreen(
-    onCourseCardClick: () -> Unit = {},
-    onNavigateToStarred: () -> Unit = {}
-) {
+fun PrefixScreen() {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         state = rememberTopAppBarState(),
         snapAnimationSpec = null
@@ -122,8 +119,7 @@ fun PrefixScreen(
         }
     ) { innerPadding ->
         CourseList(
-            innerPadding = innerPadding,
-            onCourseCardClick = onCourseCardClick
+            innerPadding = innerPadding
         )
     }
 }
