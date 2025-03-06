@@ -1,6 +1,7 @@
 package com.frogbubbletea.usthong.ui.composables
 
 import android.graphics.drawable.Icon
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -36,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.PlatformTextStyle
@@ -46,6 +49,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.R
+import com.frogbubbletea.usthong.data.Quota
+import com.frogbubbletea.usthong.data.ReservedQuota
+import com.frogbubbletea.usthong.data.Section
+import com.frogbubbletea.usthong.data.SectionSchedule
+import com.frogbubbletea.usthong.data.sampleCourses
 import com.frogbubbletea.usthong.ui.screens.CourseAttribute
 import com.frogbubbletea.usthong.ui.theme.USThongTheme
 import kotlinx.coroutines.launch
@@ -54,8 +62,14 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SectionCard(
-    // TODO: Add parameter to make it accept section data
+    section: Section
 ) {
+    // Variables to control schedule selection sheet
+    var selectedScheduleIndex by remember { mutableIntStateOf(0) }
+    val scheduleSheetState = rememberModalBottomSheetState()
+    val scheduleSheetScope = rememberCoroutineScope()
+    var scheduleSheetExpanded by remember { mutableStateOf(false) }
+
     Surface(
         modifier = Modifier
             .fillMaxWidth(),
@@ -91,7 +105,7 @@ fun SectionCard(
             ) {
                 // Section code
                 Text(
-                    text = "L1 (1001)",
+                    text = "${section.code} (${section.classNbr})",
                     style = MaterialTheme.typography.titleLarge
                 )
 
@@ -99,21 +113,71 @@ fun SectionCard(
                 CompositionLocalProvider(  // Remove hardcoded padding around button
                     LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
                 ) {
-                    RemarksRow("Mode")
-                    RemarksRow("Consent")
+                    section.remarks.map { remark ->
+                        RemarksRow(remark.key, remark.value)
+                    }
                 }
             }
 
             // Schedule selection menu
-            ScheduleSelectionMenu()
+            if (section.schedules.size > 1) {
+                CompositionLocalProvider(  // Remove hardcoded padding around button
+                    LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
+                ) {
+                    Surface(
+                        onClick = { scheduleSheetExpanded = !scheduleSheetExpanded },
+                        color = Color.Transparent,
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = section.schedules[selectedScheduleIndex].effectivePeriod,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Icon(
+                                painter = painterResource(R.drawable.material_icon_dropdown),
+                                contentDescription = stringResource(id = R.string.sections_icon_desc),
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
 
-            // Schedule
-            // TODO: Hide schedule selection menu if section only has 1 schedule
+                if (scheduleSheetExpanded) {
+                    ScheduleSelectionMenu(
+                        schedules = section.schedules,
+                        selectedScheduleIndex = selectedScheduleIndex,
+                        onSelectSchedule = { i ->
+                            selectedScheduleIndex = i
+                            scheduleSheetScope.launch { scheduleSheetState.hide() }
+                                .invokeOnCompletion {
+                                    if (!scheduleSheetState.isVisible) {
+                                        scheduleSheetExpanded = false
+                                    }
+                                }
+                        },
+                        onDismissRequest = {
+                            scheduleSheetScope.launch { scheduleSheetState.hide() }.invokeOnCompletion {
+                                if (!scheduleSheetState.isVisible) {
+                                    scheduleSheetExpanded = false
+                                }
+                            }
+                        },
+                        sheetState = scheduleSheetState
+                    )
+                }
+            }
 
-            SectionSchedule()
+            SectionSchedule(section.schedules[selectedScheduleIndex])
 
             // Quotas
-            SectionQuotas()
+            SectionQuotas(
+                totalQuotas = section.totalQuota,
+                reservedQuotas = section.reservedQuotas
+            )
         }
     }
 }
@@ -121,16 +185,19 @@ fun SectionCard(
 // Remarks row
 @Composable
 fun RemarksRow(
-    // TODO: Add parameter to make it accept remarks
+    short: String,
     remark: String
 ) {
+    // Context for toast message showing remarks full text
+    val context = LocalContext.current
+
     Surface(
         shape = MaterialTheme.shapes.small,
         color = MaterialTheme.colorScheme.tertiaryContainer,
-        onClick = { }
+        onClick = { Toast.makeText(context, remark, Toast.LENGTH_SHORT).show() }
     ) {
         Text(
-            text = remark,
+            text = short,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -143,80 +210,51 @@ fun RemarksRow(
 @Composable
 fun ScheduleSelectionMenu(
     // TODO: Add parameter to make it accept list of schedules
-    schedules: List<String> = listOf("02-NOV-2024 - 02-NOV-2024", "02-NOV-2024 - 02-NOV-2024", "16-NOV-2024 - 16-NOV-2024", "16-NOV-2024 - 16-NOV-2024", "30-NOV-2024 - 30-NOV-2024")
+//    schedules: List<String> = listOf("02-NOV-2024 - 02-NOV-2024", "02-NOV-2024 - 02-NOV-2024", "16-NOV-2024 - 16-NOV-2024", "16-NOV-2024 - 16-NOV-2024", "30-NOV-2024 - 30-NOV-2024")
+    schedules: List<SectionSchedule>,
+    selectedScheduleIndex: Int,
+    onSelectSchedule: (Int) -> Unit = { },
+    onDismissRequest: () -> Unit = { },
+    sheetState: SheetState
 ) {
     // Display selected schedule in collapsed menu
-    var selectedScheduleIndex by remember { mutableIntStateOf(0) }
-    var expanded by remember { mutableStateOf(false) }
-    val scheduleSheetState = rememberModalBottomSheetState()
-    val scheduleSheetScope = rememberCoroutineScope()
 
     CompositionLocalProvider(
         LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
     ) {
-        Surface(
-            onClick = { expanded = !expanded },
-            color = Color.Transparent,
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = schedules[selectedScheduleIndex],
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Icon(
-                    painter = painterResource(R.drawable.material_icon_dropdown),
-                    contentDescription = stringResource(id = R.string.sections_icon_desc),
-                    modifier = Modifier.size(16.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-
         // TODO: Add date & time to each entry in bottom sheet to distinguish between schedules with the same date range
-        if (expanded) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    expanded = false
-                },
-                sheetState = scheduleSheetState
-            ) {
-                // Title of bottom sheet
-                Text(
-                    text = "Select schedule",
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center
-                )
+        ModalBottomSheet(
+            onDismissRequest = {
+                onDismissRequest()
+            },
+            sheetState = sheetState
+        ) {
+            // Title of bottom sheet
+            Text(
+                text = "Select schedule",
+                modifier = Modifier
+                    .fillMaxWidth(),
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center
+            )
 
-                Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-                // Add schedules to the sheet one by one
-                LazyColumn {
-                    items(schedules.size) { i ->
-                        Surface(
+            // Add schedules to the sheet one by one
+            LazyColumn {
+                items(schedules.size) { i ->
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        color = if (i == selectedScheduleIndex) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
+                        onClick = { onSelectSchedule(i) }
+                    ) {
+                        Text(
+                            text = schedules[i].effectivePeriod,
                             modifier = Modifier
-                                .fillMaxWidth(),
-                            color = if (i == selectedScheduleIndex) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
-                            onClick = {
-                                selectedScheduleIndex = i
-                                scheduleSheetScope.launch { scheduleSheetState.hide() }.invokeOnCompletion {
-                                    if (!scheduleSheetState.isVisible) {
-                                        expanded = false
-                                    }
-                                }
-                            }
-                        ) {
-                            Text(
-                                text = schedules[i],
-                                modifier = Modifier
-                                    .padding(horizontal = 32.dp, vertical = 12.dp),
-                                color = if (i == selectedScheduleIndex) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface
-                            )
-                        }
+                                .padding(horizontal = 32.dp, vertical = 12.dp),
+                            color = if (i == selectedScheduleIndex) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
             }
@@ -228,6 +266,7 @@ fun ScheduleSelectionMenu(
 @Composable
 fun SectionSchedule(
     // TODO: Add parameter to make it accept time, venue, instructor, TA data
+    schedule: SectionSchedule
 ) {
     Surface(
         modifier = Modifier
@@ -244,29 +283,31 @@ fun SectionSchedule(
             SectionScheduleRow(
                 rowIconID = R.drawable.material_icon_calendar_clock,
                 rowIconDescription = R.string.datetime_icon_desc,
-                rowContent = "Su 09:00AM - 12:20PM"
+                rowContent = schedule.dateTimes.joinToString("; ")
             )
 
             // Venue
             SectionScheduleRow(
                 rowIconID = R.drawable.material_icon_location,
                 rowIconDescription = R.string.venue_icon_desc,
-                rowContent = "Rm 4502, Lift 25-26 (60)"
+                rowContent = schedule.venue.joinToString("; ")
             )
 
             // Instructor
             SectionScheduleRow(
                 rowIconID = R.drawable.material_icon_person,
                 rowIconDescription = R.string.inst_icon_desc,
-                rowContent = "CHEN, Hao; CHEN, Long; CHEN, Qifeng; GUO, Song; LUO, Qiong; MA, Xiaojuan; OUYANG, Xiaomin; QU, Huamin; WANG, Shuai; WANG, Wei; WEI, Victor Junqiu; YI, Ke; ZHOU, Xiaofang"
+                rowContent = schedule.instructors.joinToString("; ")
             )
 
             // TA
-            SectionScheduleRow(
-                rowIconID = R.drawable.material_icon_people,
-                rowIconDescription = R.string.ta_icon_desc,
-                rowContent = "CHEN, Hongze; DING, Ruochen; HU, Yingdong; KE, Xuanqi; LI, Zeyu; LIU, Xiangyue; SHAO, Hongjie; SONG, Shanshan; WANG, Lehan; WU, Yijian; XU, Rui; YU, Hanyang; ZHANG, Qijun; ZHAO, Chuang; ZHAO, Haoxiang; ZHAO, Jianhao"
-            )
+            if (schedule.teachingAssistants.size > 0) {
+                SectionScheduleRow(
+                    rowIconID = R.drawable.material_icon_people,
+                    rowIconDescription = R.string.ta_icon_desc,
+                    rowContent = schedule.teachingAssistants.joinToString(";")
+                )
+            }
         }
     }
 }
@@ -299,8 +340,10 @@ fun SectionScheduleRow(
 @Composable
 fun SectionQuotas(
     // TODO: Add parameter to make it accept quota data (total and reserved)
+    totalQuotas: Quota,
+    reservedQuotas: List<ReservedQuota>
 ) {
-    val totalQuotasRow: List<Int> = listOf(120, 120, 0, 106)
+    val totalQuotasRow: List<Int> = listOf(totalQuotas.quota, totalQuotas.enrol, totalQuotas.avail, totalQuotas.wait)
     val quotaHeadings: List<String> = listOf("Quota", "Enrol", "Avail", "Wait")
 
     Column(
@@ -358,8 +401,8 @@ fun SectionQuotas(
             }
 
             // Reserved quotas
-            for (i in 0..3) {
-                ReservedQuotaRow()
+            reservedQuotas.map { reservedQuota ->
+                ReservedQuotaRow(reservedQuota)
             }
         }
     }
@@ -369,9 +412,10 @@ fun SectionQuotas(
 @Composable
 fun ReservedQuotaRow(
     // TODO: Add parameter to make it accept reserved quota data
+    reservedQuota: ReservedQuota
 ) {
-    val reservedQuotaDept: String = "SHSS"
-    val reservedQuotas: List<Int> = listOf(30, 14, 16)
+    val reservedQuotaDept: String = reservedQuota.dept
+    val reservedQuotas: List<Int> = listOf(reservedQuota.quota, reservedQuota.enrol, reservedQuota.enrol)
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -409,6 +453,6 @@ fun ReservedQuotaRow(
 @Composable
 fun SectionCardPreview() {
     USThongTheme {
-        SectionCard()
+        SectionCard(sampleCourses[0].sections[0])
     }
 }

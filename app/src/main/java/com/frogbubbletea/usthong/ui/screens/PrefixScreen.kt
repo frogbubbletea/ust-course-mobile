@@ -48,6 +48,9 @@ import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.CourseScreenActivity
 import com.frogbubbletea.usthong.R
 import com.frogbubbletea.usthong.StarredScreenActivity
+import com.frogbubbletea.usthong.data.sampleCourses
+import com.frogbubbletea.usthong.data.samplePrefixes
+import com.frogbubbletea.usthong.data.sampleSemesters
 import com.frogbubbletea.usthong.ui.composables.CourseCard
 import com.frogbubbletea.usthong.ui.composables.CourseList
 import com.frogbubbletea.usthong.ui.composables.ExploreMenu
@@ -58,15 +61,22 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrefixScreen() {
+    // Sample data
+    val semesters = sampleSemesters
+    val prefixes = samplePrefixes
+    val courses = sampleCourses
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         state = rememberTopAppBarState(),
         snapAnimationSpec = null
     )
 
-    // Variable to control explore menu
+    // Variables to control explore menu
     var showExploreMenu by remember { mutableStateOf(false) }
     val exploreMenuState = rememberModalBottomSheetState()
     val exploreMenuScope = rememberCoroutineScope()
+    var selectedSemester by remember { mutableStateOf(semesters[0]) }
+    var selectedPrefix by remember { mutableStateOf(prefixes[0]) }
 
     // Current context of prefix screen activity
     val prefixScreenContext = LocalContext.current
@@ -109,13 +119,18 @@ fun PrefixScreen() {
                             Column {
                                 // Course code prefix
                                 Text(
-                                    text = "COMP",
+                                    text = selectedPrefix,
                                     style = MaterialTheme.typography.titleMedium,
                                 )
                                 // Full name of course code prefix
+//                                Text(
+//                                    text = "Computer Science and Engineering",
+//                                    style = MaterialTheme.typography.bodySmall,
+//                                )
+                                // Semester
                                 Text(
-                                    text = "Computer Science and Engineering",
-                                    style = MaterialTheme.typography.bodySmall,
+                                    text = selectedSemester,
+                                    style = MaterialTheme.typography.bodySmall
                                 )
                             }
                             Icon(
@@ -159,26 +174,38 @@ fun PrefixScreen() {
         // Explore menu
         if (showExploreMenu) {
             ExploreMenu(
-                selectedSem = "2024-25 Summer",
-                selectedPrefix = "COMP",
+                semesters = semesters,
+                prefixes = prefixes,
+                selectedSem = selectedSemester,
+                selectedPrefix = selectedPrefix,
                 onSelectStarred = {
                     exploreMenuScope.launch { exploreMenuState.hide() }.invokeOnCompletion {
                         if (!exploreMenuState.isVisible) {
                             showExploreMenu = false
                         }
 
-                        val starredIntent = Intent(prefixScreenContext, StarredScreenActivity::class.java)
+                        val starredIntent =
+                            Intent(prefixScreenContext, StarredScreenActivity::class.java)
                         prefixScreenContext.startActivity(starredIntent)
                     }
                 },
-                onSelectSem = {
+                onSelectSem = { semester ->
+                    selectedSemester = semester
                     exploreMenuScope.launch { exploreMenuState.hide() }.invokeOnCompletion {
                         if (!exploreMenuState.isVisible) {
                             showExploreMenu = false
                         }
                     }
                 },
-                onSelectPrefix = {
+                onSelectPrefix = { prefix ->
+                    selectedPrefix = prefix
+                    exploreMenuScope.launch { exploreMenuState.hide() }.invokeOnCompletion {
+                        if (!exploreMenuState.isVisible) {
+                            showExploreMenu = false
+                        }
+                    }
+                },
+                onDismissRequest = {
                     exploreMenuScope.launch { exploreMenuState.hide() }.invokeOnCompletion {
                         if (!exploreMenuState.isVisible) {
                             showExploreMenu = false
@@ -186,18 +213,12 @@ fun PrefixScreen() {
                     }
                 },
                 sheetState = exploreMenuState,
-                onDismissRequest = {
-                    exploreMenuScope.launch { exploreMenuState.hide() }.invokeOnCompletion {
-                        if (!exploreMenuState.isVisible) {
-                            showExploreMenu = false
-                        }
-                    }
-                }
             )
         }
 
         CourseList(
-            innerPadding = innerPadding
+            innerPadding = innerPadding,
+            courses = courses
         )
     }
 }

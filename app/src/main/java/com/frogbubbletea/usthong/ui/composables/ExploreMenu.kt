@@ -35,18 +35,16 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExploreMenu(
+    semesters: List<String>,
+    prefixes: List<String>,
     selectedSem: String,
     selectedPrefix: String,
     onSelectStarred: () -> Unit = { },
     onSelectSem: (String) -> Unit = { },
     onSelectPrefix: (String) -> Unit = { },
+    onDismissRequest: () -> Unit = { },
     sheetState: SheetState,
-    onDismissRequest: () -> Unit = { }
-    // TODO: add parameter to accept list of semesters and prefixes
 ) {
-    val semesters: List<String> = listOf("2024-25 Summer", "2024-25 Spring", "2024-25 Winter", "2024-25 Fall")
-    val prefixes: List<String> = MutableList(40) { "ISOM" }
-
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState
@@ -155,11 +153,11 @@ fun ExploreMenu(
                                 MaterialTheme.colorScheme.onSurface
                             }
                         )
-                        Text(
-                            text = "Information Systems, Business Statistics and Operations Management",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodySmall
-                        )
+//                        Text(
+//                            text = "Information Systems, Business Statistics and Operations Management",
+//                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+//                            style = MaterialTheme.typography.bodySmall
+//                        )
                     }
                 }
             }

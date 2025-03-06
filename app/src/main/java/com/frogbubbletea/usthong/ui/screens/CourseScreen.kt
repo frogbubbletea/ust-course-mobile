@@ -1,6 +1,13 @@
 package com.frogbubbletea.usthong.ui.screens
 
+import android.content.Context
+import android.content.ContextWrapper
+import android.content.Intent.getIntent
+import android.content.Intent.parseUri
 import android.content.res.Configuration
+import android.widget.Toast
+import androidx.activity.compose.LocalActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -19,6 +26,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -32,6 +40,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
@@ -41,6 +50,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,27 +60,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.frogbubbletea.usthong.R
+import com.frogbubbletea.usthong.data.MatchingRequirement
+import com.frogbubbletea.usthong.data.sampleCourses
 import com.frogbubbletea.usthong.ui.composables.CourseCard
 import com.frogbubbletea.usthong.ui.composables.SectionCard
 import com.frogbubbletea.usthong.ui.theme.USThongTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CourseScreen(
-    // TODO: Add parameter to this screen to accept a course
+fun CourseScreen() {
+    // Get course from the screen that launched this activity
+    val activity = LocalActivity.current;
+    val intent = activity?.intent;
+    val fromPrefix = intent?.getStringExtra("prefix") ?: ""
+    val fromCode = intent?.getStringExtra("code") ?: ""
+    val course = sampleCourses.filter({ (it.prefix == fromPrefix) && (it.code == fromCode) })[0]
 
-    onNavigateBack: () -> Unit = {},
-) {
     // Set top bar to collapse when scrolled down
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         state = rememberTopAppBarState(),
@@ -93,12 +110,12 @@ fun CourseScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("LANG 2030H")
+                    Text("${course.prefix} ${course.code}")
                 },
 
                 // Back button
                 navigationIcon = {
-                    IconButton(onClick = { /* do something */ }) {
+                    IconButton(onClick = { activity?.finish() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(id = R.string.back_icon_desc)
@@ -139,7 +156,7 @@ fun CourseScreen(
             item {
                 SelectionContainer {
                     Text(
-                        text = "Cultures and Values: Language, Communication and Society",
+                        text = course.title,
                         style = MaterialTheme.typography.titleLarge
                     )
                 }
@@ -147,28 +164,46 @@ fun CourseScreen(
 
             // Course attributes
             item {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                CompositionLocalProvider(
+                    LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
                 ) {
-                    CourseAttribute("Matching (LA)", true)
-                    CourseAttribute("4Y")
-                    CourseAttribute("CC22")
-                    CourseAttribute("MEDI")
-                    CourseAttribute("READ")
-                    CourseAttribute("DELI")
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        // Matching requirement
+                        when (course.matching) {
+                            MatchingRequirement.NONE -> Unit
+                            MatchingRequirement.TUTORIAL -> CourseAttribute(
+                                "Matching (T)",
+                                "Matching between Lecture & Tutorial required",
+                                true
+                            )
+
+                            MatchingRequirement.LAB -> CourseAttribute(
+                                "Matching (LA)",
+                                "Matching between Lecture & Lab required",
+                                true
+                            )
+                        }
+
+                        // Attributes
+                        course.attributes.map { attr ->
+                            CourseAttribute(attr.key, attr.value)
+                        }
+                    }
                 }
             }
 
             // Course info
             item {
-                CourseInfoContainer()
+                CourseInfoContainer(course.info)
             }
 
             // Sections
-            items(40) {
-                SectionCard()
+            items(course.sections) { section ->
+                SectionCard(section)
             }
 
             // Reserve space for system navbar
@@ -222,9 +257,13 @@ fun ExternalLinksDropdown() {
 // Container showing a course attribute code
 @Composable
 fun CourseAttribute(
+    short: String,
     attr: String,
     alert: Boolean = false
 ) {
+    // Context for toast message showing attribute full text
+    val context = LocalContext.current
+
     // Highlight attribute for important ones (matching required)
     val attrBgColor = if (alert) {
         MaterialTheme.colorScheme.tertiaryContainer
@@ -239,13 +278,14 @@ fun CourseAttribute(
 
     Surface(
         shape = MaterialTheme.shapes.small,
-        color = attrBgColor
+        color = attrBgColor,
+        onClick = { Toast.makeText(context, attr, Toast.LENGTH_SHORT).show() }  // Show full text of attribute
     ) {
         Box(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
         ) {
             Text(
-                text = attr,
+                text = short,
                 style = MaterialTheme.typography.bodySmall,
 //                fontWeight = FontWeight.Medium,
                 color = attrTextColor
@@ -257,7 +297,7 @@ fun CourseAttribute(
 // Surface containing course info of a course
 @Composable
 fun CourseInfoContainer(
-    // TODO: Add parameter to make it accept a map of course info titles and content
+    courseInfo: Map<String, String>
 ) {
     Surface(
         modifier = Modifier
@@ -272,43 +312,19 @@ fun CourseInfoContainer(
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Column {
-                    Text(
-                        text = "Pre-requisite",
-                        color = MaterialTheme.colorScheme.secondary,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = "(Grade B+ or above in COMP 2011 / COMP 2012 / COMP 2012H) AND (grade A- or above in COMP 2711 / COMP 2711H / MATH 2343)",
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
-
-                Column {
-                    Text(
-                        text = "Exclusion",
-                        color = MaterialTheme.colorScheme.secondary,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = "COMP 3211, COMP 4211, COMP 4221, COMP 4331, COMP 4332, COMP 4421, COMP 4471, COMP 4901K, COMP 4901L, ELEC 4130, ELEC 4230, EMIA 4110, ISOM 3360, MATH 4336, MATH 4432, RMBI 4310, COMP 5211, COMP 5212, COMP 5213, COMP 5221, COMP 5222, COMP 5215, COMP 5331, COMP 5421",
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                }
-
-                Column {
-                    Text(
-                        text = "Description",
-                        color = MaterialTheme.colorScheme.secondary,
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = "This course provides a gentle introduction to artificial intelligence (AI), and emphasizes hands-on practical experiences with Python and AI software tools to explore AI applications. Interesting applications that have been covered in previous class offerings include, but are not limited to, medical diagnosis, predictions of customer behaviour and user attitudes, character recognition, spam mail detection, text and image classifications and recognitions, sentiment analysis, and retinal vessel segmentation. The course also explores recent advances and discusses the history and ethics of AI. Only for students in their first and second year of study or those with approval from instructor by applying requisite waiver.",
-                        style = MaterialTheme.typography.bodySmall,
-                    )
+                courseInfo.map { info ->
+                    Column {
+                        Text(
+                            text = info.key,
+                            color = MaterialTheme.colorScheme.secondary,
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            text = info.value,
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
                 }
             }
         }
@@ -322,8 +338,8 @@ fun CourseInfoContainer(
     name = "Dark Mode"
 )
 @Composable
-fun CourseScreenPreview() {
+fun CourseInfoPreview() {
     USThongTheme {
-        CourseScreen()
+        CourseInfoContainer(sampleCourses[0].info)
     }
 }

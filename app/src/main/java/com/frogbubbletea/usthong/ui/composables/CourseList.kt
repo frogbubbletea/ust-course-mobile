@@ -8,15 +8,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.frogbubbletea.usthong.data.Course
 
 // Format a list of courses into a `LazyColumn` of  `CourseCard`s
 @Composable
 fun CourseList(
-    innerPadding: PaddingValues
+    innerPadding: PaddingValues,
     // TODO: Add parameter to make it accept a list of course data
+    courses: List<Course>
 ) {
     LazyColumn(
         modifier = Modifier
@@ -25,8 +28,8 @@ fun CourseList(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(40) { index ->
-            CourseCard()
+        items(courses) { course ->
+            CourseCard(course)
         }
 
         // Reserve space for system navbar

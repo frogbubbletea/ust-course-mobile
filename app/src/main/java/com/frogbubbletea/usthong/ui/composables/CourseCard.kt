@@ -46,6 +46,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.CourseScreenActivity
 import com.frogbubbletea.usthong.R
+import com.frogbubbletea.usthong.data.Course
+import com.frogbubbletea.usthong.data.sampleCourses
 import com.frogbubbletea.usthong.ui.theme.USThongTheme
 import kotlinx.coroutines.launch
 
@@ -54,9 +56,11 @@ import kotlinx.coroutines.launch
     ExperimentalMaterial3Api::class
 )
 @Composable
-fun CourseCard() {
+fun CourseCard(
+    course: Course
+) {
     // Variables for section selection bottom sheet
-    val sections = listOf("L1 (1001)", "L2 (1002)", "L3 (1003)", "L4 (1004)", "L5 (1005)", "L06 (1006)", "L07 (1007)", "L08 (1008)", "L09 (1009)", "L10 (1010)", "L11 (1011)", "T01B (1234)", "T02C (1145)", "T05A (3555)")
+    val sections = course.sections
     val sectionSheetState = rememberModalBottomSheetState()
     val sectionSheetScope = rememberCoroutineScope()
     var showSectionSheet by remember { mutableStateOf(false) }
@@ -68,7 +72,8 @@ fun CourseCard() {
 //        onClick = onClick,
         onClick = {
             val courseCardIntent = Intent(context, CourseScreenActivity::class.java)
-            courseCardIntent.putExtra("courseCode", "ACCT 1010")
+            courseCardIntent.putExtra("prefix", course.prefix)
+            courseCardIntent.putExtra("code", course.code)
             context.startActivity(courseCardIntent)
         },
         modifier = Modifier
@@ -83,13 +88,13 @@ fun CourseCard() {
         ) {
             // Course code
             Text(
-                text = "ACCT 1010",
+                text = "${course.prefix} ${course.code}",
                 style = MaterialTheme.typography.titleLarge
             )
 
             // Course title
             Text(
-                text = "Accounting, Business and Society",
+                text = course.title,
                 style = MaterialTheme.typography.bodyMedium
             )
 
@@ -113,7 +118,7 @@ fun CourseCard() {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = selectedSection,
+                                text = "${selectedSection.code} (${selectedSection.classNbr})",
                                 color = MaterialTheme.colorScheme.primary
                             )
                             Icon(
@@ -162,7 +167,7 @@ fun CourseCard() {
                                     }
                                 ) {
                                     Text(
-                                        text = section,
+                                        text = "${section.code} (${section.classNbr})",
                                         modifier = Modifier
                                             .padding(horizontal = 16.dp, vertical = 12.dp),
                                         color = if (section == selectedSection) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface
@@ -183,7 +188,7 @@ fun CourseCard() {
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "120",
+                        text = selectedSection.totalQuota.quota.toString(),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary
@@ -200,7 +205,7 @@ fun CourseCard() {
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "101",
+                        text = selectedSection.totalQuota.enrol.toString(),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary
@@ -217,7 +222,7 @@ fun CourseCard() {
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "19",
+                        text = selectedSection.totalQuota.avail.toString(),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary
@@ -234,7 +239,7 @@ fun CourseCard() {
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "0",
+                        text = selectedSection.totalQuota.wait.toString(),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary
@@ -272,7 +277,7 @@ fun CourseCard() {
                             Spacer(modifier = Modifier.width(4.dp))
 
                             Text(
-                                text = "9 sections",
+                                text = if (sections.size == 1) "${sections.size} section" else "${sections.size} sections",
                                 style = MaterialTheme.typography.bodySmall,
 //                                fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -300,7 +305,7 @@ fun CourseCard() {
                             Spacer(modifier = Modifier.width(4.dp))
 
                             Text(
-                                text = "3 units",
+                                text = if (course.units == 1) "${course.units} unit" else "${course.units} units",
                                 style = MaterialTheme.typography.bodySmall,
 //                                fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -348,6 +353,6 @@ fun CourseCard() {
 @Composable
 fun CourseCardPreview() {
     USThongTheme {
-        CourseCard()
+        CourseCard(sampleCourses[0])
     }
 }

@@ -26,6 +26,9 @@ import androidx.compose.ui.text.lerp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.R
+import com.frogbubbletea.usthong.data.sampleCourses
+import com.frogbubbletea.usthong.data.samplePrefixes
+import com.frogbubbletea.usthong.data.sampleSemesters
 import com.frogbubbletea.usthong.ui.composables.CourseList
 import com.frogbubbletea.usthong.ui.theme.USThongTheme
 
@@ -33,6 +36,9 @@ import com.frogbubbletea.usthong.ui.theme.USThongTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StarredScreen() {
+    // Sample data
+    val courses = sampleCourses
+
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         state = rememberTopAppBarState(),
         snapAnimationSpec = null
@@ -101,7 +107,10 @@ fun StarredScreen() {
             )
         }
     ) { innerPadding ->
-        CourseList(innerPadding)
+        CourseList(
+            innerPadding = innerPadding,
+            courses = courses
+        )
     }
 }
 
