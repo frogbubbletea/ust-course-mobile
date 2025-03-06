@@ -1,14 +1,17 @@
 package com.frogbubbletea.usthong.ui.screens
 
+import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.waterfall
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,24 +21,38 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.lerp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.frogbubbletea.usthong.CourseScreenActivity
 import com.frogbubbletea.usthong.R
+import com.frogbubbletea.usthong.StarredScreenActivity
 import com.frogbubbletea.usthong.ui.composables.CourseCard
 import com.frogbubbletea.usthong.ui.composables.CourseList
+import com.frogbubbletea.usthong.ui.composables.ExploreMenu
 import com.frogbubbletea.usthong.ui.theme.USThongTheme
+import kotlinx.coroutines.launch
 
 // Shows all courses under a certain prefix
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,6 +62,14 @@ fun PrefixScreen() {
         state = rememberTopAppBarState(),
         snapAnimationSpec = null
     )
+
+    // Variable to control explore menu
+    var showExploreMenu by remember { mutableStateOf(false) }
+    val exploreMenuState = rememberModalBottomSheetState()
+    val exploreMenuScope = rememberCoroutineScope()
+
+    // Current context of prefix screen activity
+    val prefixScreenContext = LocalContext.current
 
     Scaffold(
         modifier = Modifier
@@ -73,32 +98,45 @@ fun PrefixScreen() {
 
             TopAppBar(
                 title = {
-                    Column(
-//                        modifier = Modifier.padding(vertical = 16.dp)
+                    Surface(
+                        onClick = { showExploreMenu = true},
+                        color = Color.Transparent,
                     ) {
-                        // Course code prefix
-                        Text(
-                            text = "COMP",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium
-                        )
-                        // Full name of course code prefix
-                        Text(
-                            text = "Computer Science and Engineering",
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Column {
+                                // Course code prefix
+                                Text(
+                                    text = "COMP",
+                                    style = MaterialTheme.typography.titleMedium,
+                                )
+                                // Full name of course code prefix
+                                Text(
+                                    text = "Computer Science and Engineering",
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                            }
+                            Icon(
+                                painter = painterResource(R.drawable.material_icon_dropdown),
+                                contentDescription = stringResource(id = R.string.explore_icon_desc),
+                                modifier = Modifier.size(20.dp),
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     }
                 },
                 actions = {
                     // Search button
-                    IconButton(
-                        onClick = { }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.material_icon_search),
-                            contentDescription = stringResource(id = R.string.search_icon_desc)
-                        )
-                    }
+//                    IconButton(
+//                        onClick = { }
+//                    ) {
+//                        Icon(
+//                            painter = painterResource(R.drawable.material_icon_search),
+//                            contentDescription = stringResource(id = R.string.search_icon_desc)
+//                        )
+//                    }
 
                     // Sort button
                     IconButton(
@@ -118,6 +156,46 @@ fun PrefixScreen() {
             )
         }
     ) { innerPadding ->
+        // Explore menu
+        if (showExploreMenu) {
+            ExploreMenu(
+                selectedSem = "2024-25 Summer",
+                selectedPrefix = "COMP",
+                onSelectStarred = {
+                    exploreMenuScope.launch { exploreMenuState.hide() }.invokeOnCompletion {
+                        if (!exploreMenuState.isVisible) {
+                            showExploreMenu = false
+                        }
+
+                        val starredIntent = Intent(prefixScreenContext, StarredScreenActivity::class.java)
+                        prefixScreenContext.startActivity(starredIntent)
+                    }
+                },
+                onSelectSem = {
+                    exploreMenuScope.launch { exploreMenuState.hide() }.invokeOnCompletion {
+                        if (!exploreMenuState.isVisible) {
+                            showExploreMenu = false
+                        }
+                    }
+                },
+                onSelectPrefix = {
+                    exploreMenuScope.launch { exploreMenuState.hide() }.invokeOnCompletion {
+                        if (!exploreMenuState.isVisible) {
+                            showExploreMenu = false
+                        }
+                    }
+                },
+                sheetState = exploreMenuState,
+                onDismissRequest = {
+                    exploreMenuScope.launch { exploreMenuState.hide() }.invokeOnCompletion {
+                        if (!exploreMenuState.isVisible) {
+                            showExploreMenu = false
+                        }
+                    }
+                }
+            )
+        }
+
         CourseList(
             innerPadding = innerPadding
         )

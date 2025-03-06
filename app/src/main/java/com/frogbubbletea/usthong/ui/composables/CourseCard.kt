@@ -164,7 +164,7 @@ fun CourseCard() {
                                     Text(
                                         text = section,
                                         modifier = Modifier
-                                            .padding(horizontal = 32.dp, vertical = 12.dp),
+                                            .padding(horizontal = 16.dp, vertical = 12.dp),
                                         color = if (section == selectedSection) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface
                                     )
                                 }
@@ -255,8 +255,7 @@ fun CourseCard() {
                     // Number of sections
                     Surface(
                         shape = MaterialTheme.shapes.small,
-                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                        onClick = { }
+                        color = MaterialTheme.colorScheme.surfaceContainerHigh
                     ) {
                         Row(
                             modifier = Modifier

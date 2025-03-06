@@ -4,6 +4,8 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,10 +32,7 @@ import com.frogbubbletea.usthong.ui.theme.USThongTheme
 // Shows all courses starred by the user
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StarredScreen(
-    onNavigateToCourse: () -> Unit = {},
-    onNavigateBack: () -> Unit = {},
-) {
+fun StarredScreen() {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         state = rememberTopAppBarState(),
         snapAnimationSpec = null
@@ -65,16 +64,24 @@ fun StarredScreen(
 //                        style = MaterialTheme.typography.headlineMedium
                     )
                 },
-                actions = {
-                    // Search button
-                    IconButton(
-                        onClick = { }
-                    ) {
+                navigationIcon = {
+                    IconButton(onClick = { /* do something */ }) {
                         Icon(
-                            painter = painterResource(R.drawable.material_icon_search),
-                            contentDescription = stringResource(id = R.string.search_icon_desc)
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(id = R.string.back_icon_desc)
                         )
                     }
+                },
+                actions = {
+                    // Search button
+//                    IconButton(
+//                        onClick = { }
+//                    ) {
+//                        Icon(
+//                            painter = painterResource(R.drawable.material_icon_search),
+//                            contentDescription = stringResource(id = R.string.search_icon_desc)
+//                        )
+//                    }
 
                     // Sort button
                     IconButton(

@@ -13,4 +13,6 @@
     <string name="inst_icon_desc">Instructor</string>
     <string name="ta_icon_desc">TA/IA/GTA</string>
     <string name="remarks_icon_desc">Remarks</string>
+    <string name="explore_icon_desc">Semesters and prefixes</string>
+    <string name="back_icon_desc">Back</string>
 </resources>
