@@ -2,7 +2,22 @@ package com.frogbubbletea.usthong.data
 
 val sampleSemesters: List<String> = listOf("2024-25 Summer", "2024-25 Spring", "2024-25 Winter", "2024-25 Fall")
 
-val samplePrefixes: List<String> = listOf("ACCT", "AESF", "AIAA", "AISC", "AMAT", "BEHI", "BIBU", "BIEN", "BSBE", "BTEC", "CENG", "CHEM", "CHMS", "CIEM", "CIVL", "CMAA", "COMP", "CPEG", "CSIC", "CSIT", "CTDL", "DASC", "DBAP", "DRAP", "DSAA", "DSCT", "ECON", "EEMT", "EESM", "ELEC", "EMIA", "ENEG", "ENGG", "ENTR", "ENVR", "ENVS", "EOAS", "EVNG", "EVSM", "FINA", "FTEC", "GBUS", "GFIN", "GNED", "HLTH", "HMAW", "HMMA", "HUMA", "IBTM", "IEDA", "IIMP", "INTR", "IOTA", "IPEN", "ISDN", "ISOM", "JEVE", "LABU", "LANG", "LIFS", "MAED", "MAFS", "MARK", "MASS", "MATH", "MCEE", "MECH", "MESF", "MFIT", "MGCS", "MGMT", "MICS", "MILE", "MIMT", "MSBD", "MSDM", "MTLE", "NANO", "OCES", "PDEV", "PHYS", "PPOL", "RMBI", "ROAS", "SBMT", "SCIE", "SEEN", "SHSS", "SMMG", "SOSC", "SUST", "TEMG", "UCOP", "UGOD", "UPOP", "UROP", "UTOP", "WBBA")
+// val samplePrefixes: List<String> = listOf("ACCT", "AESF", "AIAA", "AISC", "AMAT", "BEHI", "BIBU", "BIEN", "BSBE", "BTEC", "CENG", "CHEM", "CHMS", "CIEM", "CIVL", "CMAA", "COMP", "CPEG", "CSIC", "CSIT", "CTDL", "DASC", "DBAP", "DRAP", "DSAA", "DSCT", "ECON", "EEMT", "EESM", "ELEC", "EMIA", "ENEG", "ENGG", "ENTR", "ENVR", "ENVS", "EOAS", "EVNG", "EVSM", "FINA", "FTEC", "GBUS", "GFIN", "GNED", "HLTH", "HMAW", "HMMA", "HUMA", "IBTM", "IEDA", "IIMP", "INTR", "IOTA", "IPEN", "ISDN", "ISOM", "JEVE", "LABU", "LANG", "LIFS", "MAED", "MAFS", "MARK", "MASS", "MATH", "MCEE", "MECH", "MESF", "MFIT", "MGCS", "MGMT", "MICS", "MILE", "MIMT", "MSBD", "MSDM", "MTLE", "NANO", "OCES", "PDEV", "PHYS", "PPOL", "RMBI", "ROAS", "SBMT", "SCIE", "SEEN", "SHSS", "SMMG", "SOSC", "SUST", "TEMG", "UCOP", "UGOD", "UPOP", "UROP", "UTOP", "WBBA")
+
+val samplePrefixes: List<Prefix> = listOf(
+    Prefix(
+        name = "ACCT",
+        type = PrefixType.UG
+    ),
+    Prefix(
+        name = "COMP",
+        type = PrefixType.UG
+    ),
+    Prefix(
+        name = "EEMT",
+        type = PrefixType.PG
+    )
+)
 
 val sampleCourses: List<Course> = listOf(
     Course(

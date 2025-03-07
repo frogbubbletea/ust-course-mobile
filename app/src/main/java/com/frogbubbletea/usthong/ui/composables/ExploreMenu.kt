@@ -1,6 +1,8 @@
 package com.frogbubbletea.usthong.ui.composables
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -28,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.R
+import com.frogbubbletea.usthong.data.Prefix
 import com.frogbubbletea.usthong.ui.theme.USThongTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -37,12 +40,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun ExploreMenu(
     semesters: List<String>,
-    prefixes: List<String>,
+    prefixes: List<Prefix>,
     selectedSem: String,
-    selectedPrefix: String,
+    selectedPrefix: Prefix,
     onSelectStarred: () -> Unit = { },
     onSelectSem: (String) -> Unit = { },
-    onSelectPrefix: (String) -> Unit = { },
+    onSelectPrefix: (Prefix) -> Unit = { },
     onDismissRequest: () -> Unit = { },
     sheetState: SheetState,
 ) {
@@ -144,11 +147,11 @@ fun ExploreMenu(
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = prefix,
+                            text = prefix.name,
                             color = if (prefix == selectedPrefix) {
                                 MaterialTheme.colorScheme.onSecondaryContainer
                             } else {
@@ -160,6 +163,20 @@ fun ExploreMenu(
 //                            color = MaterialTheme.colorScheme.onSurfaceVariant,
 //                            style = MaterialTheme.typography.bodySmall
 //                        )
+                        Surface(
+                            shape = MaterialTheme.shapes.small,
+                            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        ) {
+                            Box(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = prefix.type.toString(),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
                     }
                 }
             }

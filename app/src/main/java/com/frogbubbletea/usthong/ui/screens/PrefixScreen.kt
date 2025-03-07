@@ -119,7 +119,7 @@ fun PrefixScreen() {
                             Column {
                                 // Course code prefix
                                 Text(
-                                    text = selectedPrefix,
+                                    text = selectedPrefix.name,
                                     style = MaterialTheme.typography.titleMedium,
                                 )
                                 // Full name of course code prefix
