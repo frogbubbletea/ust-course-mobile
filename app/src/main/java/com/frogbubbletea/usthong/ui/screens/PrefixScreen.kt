@@ -28,6 +28,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,9 +49,12 @@ import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.CourseScreenActivity
 import com.frogbubbletea.usthong.R
 import com.frogbubbletea.usthong.StarredScreenActivity
+import com.frogbubbletea.usthong.data.Prefix
 import com.frogbubbletea.usthong.data.sampleCourses
 import com.frogbubbletea.usthong.data.samplePrefixes
 import com.frogbubbletea.usthong.data.sampleSemesters
+import com.frogbubbletea.usthong.network.ScrapingStatus
+import com.frogbubbletea.usthong.network.scrapeCourses
 import com.frogbubbletea.usthong.ui.composables.CourseCard
 import com.frogbubbletea.usthong.ui.composables.CourseList
 import com.frogbubbletea.usthong.ui.composables.ExploreMenu
@@ -80,6 +84,14 @@ fun PrefixScreen() {
 
     // Current context of prefix screen activity
     val prefixScreenContext = LocalContext.current
+
+    // Load course data
+    var scraping by remember { mutableStateOf(ScrapingStatus.LOADING) }
+    LaunchedEffect(selectedSemester, selectedPrefix) {
+        scraping = ScrapingStatus.LOADING
+        scrapeCourses()
+        scraping = ScrapingStatus.SUCCESS
+    }
 
     Scaffold(
         modifier = Modifier
@@ -216,10 +228,18 @@ fun PrefixScreen() {
             )
         }
 
-        CourseList(
-            innerPadding = innerPadding,
-            courses = courses
-        )
+        when (scraping) {
+            ScrapingStatus.LOADING -> Unit
+            ScrapingStatus.ERROR -> Unit
+            ScrapingStatus.SUCCESS -> CourseList(
+                innerPadding = innerPadding,
+                courses = courses
+            )
+        }
+//        CourseList(
+//            innerPadding = innerPadding,
+//            courses = courses
+//        )
     }
 }
 
