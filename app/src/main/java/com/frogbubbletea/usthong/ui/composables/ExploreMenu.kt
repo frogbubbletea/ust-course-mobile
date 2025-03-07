@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,7 +48,8 @@ fun ExploreMenu(
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
-        sheetState = sheetState
+        sheetState = sheetState,
+        modifier = Modifier.statusBarsPadding()
     ) {
         LazyColumn {
             // Starred
@@ -78,7 +80,7 @@ fun ExploreMenu(
 
             item {
                 HorizontalDivider(
-                    modifier = Modifier.padding(top = 8.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
                 )
             }
 
@@ -88,7 +90,7 @@ fun ExploreMenu(
                     text = "Semesters",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                 )
             }
             items(semesters) { semester ->
@@ -116,7 +118,7 @@ fun ExploreMenu(
 
             item {
                 HorizontalDivider(
-                    modifier = Modifier.padding(top = 8.dp, bottom = 12.dp)
+                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
                 )
             }
 
@@ -126,7 +128,7 @@ fun ExploreMenu(
                     text = "Prefixes",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                 )
             }
             items(prefixes) { prefix ->
