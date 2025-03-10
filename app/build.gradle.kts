@@ -75,4 +75,8 @@ dependencies {
     implementation("androidx.transition:transition-ktx:1.5.1")
 
     implementation(platform(libs.androidx.compose.bom))
+
+    implementation("com.fleeksoft.ksoup:ksoup-kotlinx:0.2.2")
+
+    implementation("com.fleeksoft.ksoup:ksoup-network:0.2.2")
 }

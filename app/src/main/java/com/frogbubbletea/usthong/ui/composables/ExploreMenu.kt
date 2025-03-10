@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.R
 import com.frogbubbletea.usthong.data.Prefix
+import com.frogbubbletea.usthong.data.Semester
 import com.frogbubbletea.usthong.ui.theme.USThongTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -39,12 +40,12 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExploreMenu(
-    semesters: List<String>,
+    semesters: List<Semester>,
     prefixes: List<Prefix>,
-    selectedSem: String,
+    selectedSem: Semester,
     selectedPrefix: Prefix,
     onSelectStarred: () -> Unit = { },
-    onSelectSem: (String) -> Unit = { },
+    onSelectSem: (Semester) -> Unit = { },
     onSelectPrefix: (Prefix) -> Unit = { },
     onDismissRequest: () -> Unit = { },
     sheetState: SheetState,
@@ -108,7 +109,7 @@ fun ExploreMenu(
                     onClick = { onSelectSem(semester) }
                 ) {
                     Text(
-                        text = semester,
+                        text = semester.name,
                         color = if (semester == selectedSem) {
                             MaterialTheme.colorScheme.onSecondaryContainer
                         } else {

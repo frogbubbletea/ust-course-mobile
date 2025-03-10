@@ -64,6 +64,8 @@ import com.frogbubbletea.usthong.CourseScreenActivity
 import com.frogbubbletea.usthong.R
 import com.frogbubbletea.usthong.StarredScreenActivity
 import com.frogbubbletea.usthong.data.Prefix
+import com.frogbubbletea.usthong.data.PrefixType
+import com.frogbubbletea.usthong.data.Semester
 import com.frogbubbletea.usthong.data.sampleCourses
 import com.frogbubbletea.usthong.data.samplePrefixes
 import com.frogbubbletea.usthong.data.sampleSemesters
@@ -81,9 +83,14 @@ import kotlinx.coroutines.runBlocking
 @Composable
 fun PrefixScreen() {
     // Sample data
-    val semesters = sampleSemesters
-    val prefixes = samplePrefixes
+//    val semesters = sampleSemesters
+//     val prefixes = samplePrefixes
     val courses = sampleCourses
+
+    // Variables for course data
+    var prefixes: List<Prefix> by remember { mutableStateOf(listOf()) }  // Course code prefixes
+    var semesters: List<Semester> by remember { mutableStateOf(listOf()) }  // Semesters
+    var error: String by remember { mutableStateOf("") }  // Error message
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         state = rememberTopAppBarState(),
@@ -94,8 +101,18 @@ fun PrefixScreen() {
     var showExploreMenu by remember { mutableStateOf(false) }
     val exploreMenuState = rememberModalBottomSheetState()
     val exploreMenuScope = rememberCoroutineScope()
-    var selectedSemester by remember { mutableStateOf(semesters[0]) }
-    var selectedPrefix by remember { mutableStateOf(prefixes[0]) }
+    var selectedSemester by remember { mutableStateOf(
+        Semester(
+            name = "",
+            code = 0
+        )
+    ) }
+    var selectedPrefix by remember { mutableStateOf(
+        Prefix(
+            name = "",
+            type = PrefixType.UNDEFINED,
+        )
+    ) }
 
     // Current context of prefix screen activity
     val prefixScreenContext = LocalContext.current
@@ -104,8 +121,30 @@ fun PrefixScreen() {
     var scraping by remember { mutableStateOf(ScrapingStatus.LOADING) }
     LaunchedEffect(selectedSemester, selectedPrefix) {
         scraping = ScrapingStatus.LOADING
-        scrapeCourses()
-        scraping = ScrapingStatus.SUCCESS
+        try {
+            // Perform course data scraping
+            val scrapeResult = scrapeCourses(
+                prefix = if (selectedPrefix.name == "") null else selectedPrefix,
+                semester = if (selectedSemester.code == 0) null else selectedSemester
+            )
+
+            // Unpack scraped data
+            prefixes = scrapeResult.prefixes
+            semesters = scrapeResult.semesters
+
+            // Assign first prefix and latest semester after initial scrape
+//            if (selectedPrefix.name == "")
+//                selectedPrefix = prefixes[0]
+//            if (selectedSemester.code == 0)
+//                selectedSemester = semesters[0]
+            selectedPrefix = scrapeResult.scrapedPrefix
+            selectedSemester = scrapeResult.scrapedSemester
+
+            scraping = ScrapingStatus.SUCCESS
+        } catch (e: Exception) {
+            scraping = ScrapingStatus.ERROR
+            error = e.stackTraceToString()
+        }
     }
 
     Scaffold(
@@ -156,7 +195,7 @@ fun PrefixScreen() {
 //                                )
                                 // Semester
                                 Text(
-                                    text = selectedSemester,
+                                    text = selectedSemester.name,
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
@@ -267,6 +306,18 @@ fun PrefixScreen() {
                         modifier = Modifier
                             .width(32.dp),
                     )
+                }
+            }
+        }
+
+        if (scraping == ScrapingStatus.ERROR) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                item {
+                    Text(error)
                 }
             }
         }
