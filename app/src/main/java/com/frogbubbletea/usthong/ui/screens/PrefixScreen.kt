@@ -2,7 +2,16 @@ package com.frogbubbletea.usthong.ui.screens
 
 import android.content.Intent
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,18 +22,22 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.waterfall
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -45,6 +58,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.lerp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.CourseScreenActivity
 import com.frogbubbletea.usthong.R
@@ -60,6 +74,7 @@ import com.frogbubbletea.usthong.ui.composables.CourseList
 import com.frogbubbletea.usthong.ui.composables.ExploreMenu
 import com.frogbubbletea.usthong.ui.theme.USThongTheme
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 // Shows all courses under a certain prefix
 @OptIn(ExperimentalMaterial3Api::class)
@@ -228,18 +243,48 @@ fun PrefixScreen() {
             )
         }
 
-        when (scraping) {
-            ScrapingStatus.LOADING -> Unit
-            ScrapingStatus.ERROR -> Unit
-            ScrapingStatus.SUCCESS -> CourseList(
+//        when (scraping) {
+//            ScrapingStatus.LOADING -> Unit
+//            ScrapingStatus.ERROR -> Unit
+//            ScrapingStatus.SUCCESS -> CourseList(
+//                innerPadding = innerPadding,
+//                courses = courses
+//            )
+//        }
+        if (scraping == ScrapingStatus.LOADING) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                Box(
+                    contentAlignment = Alignment.TopCenter,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .width(32.dp),
+                    )
+                }
+            }
+        }
+
+        AnimatedVisibility(
+            visible = (scraping == ScrapingStatus.SUCCESS),
+            enter = slideInVertically(
+                initialOffsetY = { 120 }
+            ) + fadeIn(),
+            exit = slideOutVertically(
+                targetOffsetY = { 120 }
+            ) + fadeOut()
+        ) {
+            CourseList(
                 innerPadding = innerPadding,
                 courses = courses
             )
         }
-//        CourseList(
-//            innerPadding = innerPadding,
-//            courses = courses
-//        )
     }
 }
 

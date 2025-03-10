@@ -74,4 +74,5 @@ dependencies {
 
     implementation("androidx.transition:transition-ktx:1.5.1")
 
+    implementation(platform(libs.androidx.compose.bom))
 }
