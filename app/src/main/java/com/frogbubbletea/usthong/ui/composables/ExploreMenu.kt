@@ -57,36 +57,37 @@ fun ExploreMenu(
     ) {
         LazyColumn {
             // Starred
-            item {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = Color.Transparent,
-                    onClick = {
-                        // TODO: Redirect to starred screen
-                        onSelectStarred()
-                    }
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.material_icon_star),
-                            contentDescription = stringResource(id = R.string.star_icon_desc),
-                            modifier = Modifier.size(20.dp),
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
-                        Text("Starred courses")
-                    }
-                }
-            }
-
-            item {
-                HorizontalDivider(
-                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
-                )
-            }
+            // TODO: Implement course starring function
+//            item {
+//                Surface(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    color = Color.Transparent,
+//                    onClick = {
+//                        // TODO: Redirect to starred screen
+//                        onSelectStarred()
+//                    }
+//                ) {
+//                    Row(
+//                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+//                        verticalAlignment = Alignment.CenterVertically,
+//                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+//                    ) {
+//                        Icon(
+//                            painter = painterResource(R.drawable.material_icon_star),
+//                            contentDescription = stringResource(id = R.string.star_icon_desc),
+//                            modifier = Modifier.size(20.dp),
+//                            tint = MaterialTheme.colorScheme.onSurface
+//                        )
+//                        Text("Starred courses")
+//                    }
+//                }
+//            }
+//
+//            item {
+//                HorizontalDivider(
+//                    modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
+//                )
+//            }
 
             // Select semester
             item {

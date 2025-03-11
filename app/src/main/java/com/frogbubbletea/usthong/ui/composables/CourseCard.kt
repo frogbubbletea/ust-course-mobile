@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -74,6 +75,9 @@ fun CourseCard(
     }
 
     val context = LocalContext.current
+
+    // Handle external links
+    val uriHandler = LocalUriHandler.current
 
     Surface(
 //        onClick = onClick,
@@ -326,24 +330,25 @@ fun CourseCard(
                     Spacer(modifier = Modifier.weight(1f))
 
                     // Star button
-                    IconButton(
-                        modifier = Modifier.
-                        then(Modifier.size(28.dp)),
-                        onClick = { }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.material_icon_star),
-                            contentDescription = stringResource(id = R.string.star_icon_desc),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
+                    // TODO: Implement course starring function
+//                    IconButton(
+//                        modifier = Modifier.
+//                        then(Modifier.size(28.dp)),
+//                        onClick = { }
+//                    ) {
+//                        Icon(
+//                            painter = painterResource(R.drawable.material_icon_star),
+//                            contentDescription = stringResource(id = R.string.star_icon_desc),
+//                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+//                            modifier = Modifier.size(24.dp)
+//                        )
+//                    }
 
                     // Open in Class Schedule & Quota button
                     IconButton(
                         modifier = Modifier.
                         then(Modifier.size(28.dp)),
-                        onClick = { }
+                        onClick = { uriHandler.openUri("https://w5.ab.ust.hk/wcq/cgi-bin/${course.semester.code}/subject/${course.prefix.name}#${course.prefix.name}${course.code}") }
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.material_icon_open_in_browser),

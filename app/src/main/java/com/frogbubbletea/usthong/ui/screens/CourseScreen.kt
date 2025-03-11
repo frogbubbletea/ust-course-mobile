@@ -69,6 +69,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -193,17 +194,22 @@ fun CourseScreen() {
 
                 actions = {
                     // Star button
-                    IconButton(
-                        onClick = { }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.material_icon_star),
-                            contentDescription = stringResource(id = R.string.star_icon_desc)
-                        )
-                    }
+                    // TODO: Implement course starring function
+//                    IconButton(
+//                        onClick = { }
+//                    ) {
+//                        Icon(
+//                            painter = painterResource(R.drawable.material_icon_star),
+//                            contentDescription = stringResource(id = R.string.star_icon_desc)
+//                        )
+//                    }
 
                     // Dropdown menu button
-                    ExternalLinksDropdown()
+                    ExternalLinksDropdown(
+                        prefix = fromPrefix,
+                        code = fromCode,
+                        semester = fromSemester
+                    )
                 },
 
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -339,8 +345,16 @@ fun CourseScreen() {
 
 // Dropdown menu containing external links
 @Composable
-fun ExternalLinksDropdown() {
+fun ExternalLinksDropdown(
+    prefix: Prefix,
+    code: String,
+    semester: Semester
+) {
     var expanded by remember { mutableStateOf(false) }
+
+    // Handle external links
+    val uriHandler = LocalUriHandler.current
+
     Box {
         IconButton(onClick = { expanded = !expanded }) {
             Icon(Icons.Default.MoreVert, contentDescription = "More options")
@@ -357,7 +371,10 @@ fun ExternalLinksDropdown() {
                         style = MaterialTheme.typography.bodyLarge
                     )
                 },
-                onClick = { expanded = false }
+                onClick = {
+                    uriHandler.openUri("https://ust.space/review/${prefix.name}${code}")
+                    expanded = false
+                }
             )
             DropdownMenuItem(
                 text = {
@@ -367,7 +384,10 @@ fun ExternalLinksDropdown() {
                         style = MaterialTheme.typography.bodyLarge
                     )
                 },
-                onClick = { expanded = false }
+                onClick = {
+                    uriHandler.openUri("https://w5.ab.ust.hk/wcq/cgi-bin/${semester.code}/subject/${prefix.name}#${prefix.name}${code}")
+                    expanded = false
+                }
             )
         }
     }
