@@ -9,16 +9,22 @@ import com.frogbubbletea.usthong.data.Course
 import com.frogbubbletea.usthong.data.MatchingRequirement
 import com.frogbubbletea.usthong.data.Prefix
 import com.frogbubbletea.usthong.data.PrefixType
+import com.frogbubbletea.usthong.data.Quota
+import com.frogbubbletea.usthong.data.ReservedQuota
+import com.frogbubbletea.usthong.data.Section
+import com.frogbubbletea.usthong.data.SectionSchedule
 import com.frogbubbletea.usthong.data.Semester
 import com.frogbubbletea.usthong.data.samplePrefixes
 import com.frogbubbletea.usthong.data.sampleSemesters
 import kotlinx.coroutines.*
+import java.util.Locale
 
 data class ScrapeResult(
     val scrapedPrefix: Prefix,
     val scrapedSemester: Semester,
     val prefixes: List<Prefix>,
     val semesters: List<Semester>,
+    val courses: List<Course>
 )
 
 suspend fun scrapeCourses(
@@ -86,7 +92,7 @@ suspend fun scrapeCourses(
         val suffixCode: String = fullCode?.substring(4) ?: ""  // Course.code
 
         // Extract title and units
-        val titleAndUnits: String = course.select(".courseinfo > .courseattrContainer > .subject").first()?.text() ?: ""
+        val titleAndUnits: String = course.select(".courseinfo > .courseattrContainer > .subject").first()?.text()?.split("-")?.last()?.trim() ?: ""
         val unitsRegex = Regex("\\(\\d units*\\)")
         val unitsText: String? = unitsRegex.find(titleAndUnits)?.value
         val units: Int = unitsText?.substring(1, 2)?.toInt() ?: 0  // Course.units
@@ -111,7 +117,7 @@ suspend fun scrapeCourses(
                 replacement = ""
             )
             val attrContent: String = attr.selectFirst(".popupdetail")?.text() ?: ""
-            attributes.put(attrTitle, attrContent)
+            attributes[attrTitle] = attrContent
         }
 
         // Extract course info
@@ -119,22 +125,181 @@ suspend fun scrapeCourses(
         val infoRows: Elements? = infoTable?.select("tbody > tr")
         val info = mutableMapOf<String, String>()  // Course.info
         infoRows?.forEach { infoRow ->
-            val infoTitle: String = infoRow.selectFirst("th")?.text() ?: ""
+            // Convert title to title case
+            val infoTitle: String = infoRow.selectFirst("th")?.text()?.lowercase()?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() } ?: ""
             val infoContent: String = infoRow.selectFirst("td")?.text() ?: ""
-            info.put(infoTitle, infoContent)
+            info[infoTitle] = infoContent
         }
 
         // Extract sections
         val sectionsTable: Element? = course.selectFirst(".sections > tbody")
         val sectionsRows: Elements? = sectionsTable?.select(".newsect.secteven, .newsect.sectodd, .secteven, .sectodd")
         // TODO: continue extracting sections
+        val sections = mutableListOf<Section>()  // Course.sections
+        sectionsRows?.forEach { sectionRow ->
+            val sectionColumns: Elements = sectionRow.select("td")
+
+            if (sectionRow.attr("class").contains("newsect")) {  // Add new section
+                // Get section code and class number
+                val sectionCodeClassNbr: String = sectionColumns[0].text()
+                val sectionCodeRegex = Regex("\\(\\d+\\)")
+                val classNbrRegex = Regex("\\(|\\)")  // Remove surrounding parentheses
+                val sectionCode: String = sectionCodeRegex.replace(sectionCodeClassNbr, "").trim()  // Course.sections[x].code
+                val classNbrRaw: String = sectionCodeRegex.find(sectionCodeClassNbr)?.value ?: ""
+                val classNbr: Int = classNbrRegex.replace(classNbrRaw, "").trim().toInt()  // Course.sections[x].classNbr
+
+                // Get schedule
+                val dateAndTimeRaw: String = sectionColumns[1].html()
+                val dateAndTimeSplit: List<String> = dateAndTimeRaw.split("<br>")
+                val effectivePeriod: String = dateAndTimeSplit[0].trim()  // Course.sections[x].schedules[y].effectivePeriod
+                val dateTimes: String = dateAndTimeSplit.last().trim()  // Course.sections[x].schedules[y].dateTimes
+                val venue: String = sectionColumns[2].text()  // Course.sections[x].schedules[y].venue
+
+                // Get instructors
+                val instructorsRaw: Elements = sectionColumns[3].select(".instructorList > a")
+                // Course.sections[x].schedule[y].instructors
+                val instructors: List<String> = if (instructorsRaw.size > 0) {
+                    instructorsRaw.map { instructor ->
+                        instructor.text()
+                    }
+                } else {  // If instructor is TBA
+                    sectionColumns[3].select(".instructorList").map { instructor ->
+                        instructor.text()
+                    }
+                }
+
+                // Get TAs
+                val tasRaw: Elements = sectionColumns[4].select(".taListContainer > .taList > a")
+                val tas: List<String> = tasRaw.map { ta ->  // Course.sections[x].schedule[y].teachingAssistants
+                    ta.text()
+                }
+
+                // Put schedule, instructors, TAs into SectionSchedule instance
+                val schedule = SectionSchedule(
+                    effectivePeriod = effectivePeriod,
+                    dateTimes = dateTimes,
+                    venue = venue,
+                    instructors = instructors,
+                    teachingAssistants = tas
+                )
+
+                // Get total quotas
+                // Course.sections[x].totalQuota.quota
+                val totalQuotaQuota: Int = if (sectionColumns[5].attr("class").contains("quota")) {  // If reserved quota is present
+                    sectionColumns[5].selectFirst("span")?.text()?.toInt() ?: 0
+                } else {  // If reserved quota is not present
+                    sectionColumns[5].text().toInt()
+                }
+                val totalQuotaEnrol: Int = sectionColumns[6].text().toInt()  // Course.sections[x].totalQuota.enrol
+                val totalQuotaAvail: Int = sectionColumns[7].text().toInt()  // Course.sections[x].totalQuota.avail
+                val totalQuotaWait: Int = sectionColumns[8].text().toInt()  // Course.sections[x].totalQuota.wait
+                val totalQuota = Quota(  // Course.sections[x].totalQuota
+                    quota = totalQuotaQuota,
+                    enrol = totalQuotaEnrol,
+                    avail = totalQuotaAvail,
+                    wait = totalQuotaWait,
+                )
+
+                // Get reserved quotas
+                val reservedQuotas: List<ReservedQuota> = if (sectionColumns[5].attr("class").contains("quota")) {  // Course.sections[x].reservedQuotas
+                    val reservedQuotasRaw = sectionColumns[5].select("div > .quotadetail > div").toList().drop(1)
+                    reservedQuotasRaw.map { reservedQuota ->
+                        val reservedQuotaDept: String = reservedQuota.text().split(":")[0].trim()  // Course.sections[x].reservedQuotas[z].dept
+                        val reservedQuotaQEA: List<String> = reservedQuota.text().split(":").last().trim().split("/")
+                        val reservedQuotaQuota: Int = reservedQuotaQEA[0].toInt()  // Course.sections[x].reservedQuotas[z].quota
+                        val reservedQuotaEnrol: Int = reservedQuotaQEA[1].toInt()  // Course.sections[x].reservedQuotas[z].enrol
+                        val reservedQuotaAvail: Int = reservedQuotaQEA[2].toInt()  // Course.sections[x].reservedQuotas[z].avail
+                        ReservedQuota(  // Course.sections[x].reservedQuotas[z]
+                            dept = reservedQuotaDept,
+                            quota = reservedQuotaQuota,
+                            enrol = reservedQuotaEnrol,
+                            avail = reservedQuotaAvail
+                        )
+                    }
+                } else {
+                    listOf()
+                }
+
+                // Get remarks
+                val remarks = mutableMapOf<String, String>()  // Course.sections[x].remarks
+                val classNotes: List<String> = sectionColumns[9].selectFirst("div > .popup.classnotes > .popupdetail")?.html()?.split("<br>") ?: listOf()
+                val consents: List<String> = sectionColumns[9].selectFirst("div > .popup.consent > .popupdetail")?.html()?.split("<br>") ?: listOf()
+                classNotes.forEachIndexed { idx, classNote ->
+                    remarks["Note ${idx + 1}"] = classNote.replace("&gt;", "").trim()  // Remove > symbol leading each remark
+                }
+                consents.forEachIndexed { idx, consent ->
+                    remarks["Consent"] = consent.replace("&gt;", "").trim()
+                }
+
+                sections += Section(
+                    code = sectionCode,
+                    classNbr = classNbr,
+                    schedules = listOf(schedule),
+                    totalQuota = totalQuota,
+                    reservedQuotas = reservedQuotas,
+                    remarks = remarks
+                )
+            } else {  // Add additional schedules in section
+                // Get schedule
+                val dateAndTimeRaw: String = sectionColumns[1].html()
+                val dateAndTimeSplit: List<String> = dateAndTimeRaw.split("<br>")
+                val effectivePeriod: String = dateAndTimeSplit[0].trim()  // Course.sections[x].schedules[y].effectivePeriod
+                val dateTimes: String = dateAndTimeSplit.last().trim()  // Course.sections[x].schedules[y].dateTimes
+                val venue: String = sectionColumns[2].text()  // Course.sections[x].schedules[y].venue
+
+                // Get instructors
+                val instructorsRaw: Elements = sectionColumns[3].select(".instructorList > a")
+                val instructors: List<String> = instructorsRaw.map { instructor ->  // Course.sections[x].schedule[y].instructors
+                    instructor.text()
+                }
+
+                // Get TAs
+                val tasRaw: Elements = sectionColumns[4].select(".taListContainer > .taList > a")
+                val tas: List<String> = tasRaw.map { ta ->  // Course.sections[x].schedule[y].teachingAssistants
+                    ta.text()
+                }
+
+                // Put schedule, instructors, TAs into SectionSchedule instance
+                val schedule = SectionSchedule(
+                    effectivePeriod = effectivePeriod,
+                    dateTimes = dateTimes,
+                    venue = venue,
+                    instructors = instructors,
+                    teachingAssistants = tas
+                )
+
+                // Add the additional schedule into section
+                val newSection = Section(
+                    code = sections.last().code,
+                    classNbr = sections.last().classNbr,
+                    schedules = sections.last().schedules + schedule,
+                    totalQuota = sections.last().totalQuota,
+                    reservedQuotas = sections.last().reservedQuotas,
+                    remarks = sections.last().remarks,
+                )
+                sections[sections.lastIndex] = newSection
+            }
+        }
+
+        Course(
+            prefix = scrapedPrefix,
+            code = suffixCode,
+            semester = scrapedSemester,
+            title = title,
+            units = units,
+            matching = matching,
+            attributes = attributes.toMap(),
+            info = info.toMap(),
+            sections = sections.toList()
+        )
     }
 
     return ScrapeResult(
         scrapedPrefix = scrapedPrefix,
         scrapedSemester = scrapedSemester,
         prefixes = prefixes,
-        semesters = semesters
+        semesters = semesters,
+        courses = courses
     )
 }
 

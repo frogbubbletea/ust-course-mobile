@@ -35,6 +35,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,7 +67,7 @@ fun SectionCard(
     section: Section
 ) {
     // Variables to control schedule selection sheet
-    var selectedScheduleIndex by remember { mutableIntStateOf(0) }
+    var selectedScheduleIndex by rememberSaveable { mutableIntStateOf(0) }
     val scheduleSheetState = rememberModalBottomSheetState()
     val scheduleSheetScope = rememberCoroutineScope()
     var scheduleSheetExpanded by remember { mutableStateOf(false) }
@@ -121,55 +122,53 @@ fun SectionCard(
             }
 
             // Schedule selection menu
-            if (section.schedules.size > 1) {
-                CompositionLocalProvider(  // Remove hardcoded padding around button
-                    LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
+            CompositionLocalProvider(  // Remove hardcoded padding around button
+                LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
+            ) {
+                Surface(
+                    onClick = { scheduleSheetExpanded = !scheduleSheetExpanded },
+                    color = Color.Transparent,
                 ) {
-                    Surface(
-                        onClick = { scheduleSheetExpanded = !scheduleSheetExpanded },
-                        color = Color.Transparent,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = section.schedules[selectedScheduleIndex].effectivePeriod,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Icon(
-                                painter = painterResource(R.drawable.material_icon_dropdown),
-                                contentDescription = stringResource(id = R.string.sections_icon_desc),
-                                modifier = Modifier.size(16.dp),
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                        }
+                        Text(
+                            text = section.schedules[selectedScheduleIndex].effectivePeriod,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Icon(
+                            painter = painterResource(R.drawable.material_icon_dropdown),
+                            contentDescription = stringResource(id = R.string.sections_icon_desc),
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
+            }
 
-                if (scheduleSheetExpanded) {
-                    ScheduleSelectionMenu(
-                        schedules = section.schedules,
-                        selectedScheduleIndex = selectedScheduleIndex,
-                        onSelectSchedule = { i ->
-                            selectedScheduleIndex = i
-                            scheduleSheetScope.launch { scheduleSheetState.hide() }
-                                .invokeOnCompletion {
-                                    if (!scheduleSheetState.isVisible) {
-                                        scheduleSheetExpanded = false
-                                    }
-                                }
-                        },
-                        onDismissRequest = {
-                            scheduleSheetScope.launch { scheduleSheetState.hide() }.invokeOnCompletion {
+            if (scheduleSheetExpanded) {
+                ScheduleSelectionMenu(
+                    schedules = section.schedules,
+                    selectedScheduleIndex = selectedScheduleIndex,
+                    onSelectSchedule = { i ->
+                        selectedScheduleIndex = i
+                        scheduleSheetScope.launch { scheduleSheetState.hide() }
+                            .invokeOnCompletion {
                                 if (!scheduleSheetState.isVisible) {
                                     scheduleSheetExpanded = false
                                 }
                             }
-                        },
-                        sheetState = scheduleSheetState
-                    )
-                }
+                    },
+                    onDismissRequest = {
+                        scheduleSheetScope.launch { scheduleSheetState.hide() }.invokeOnCompletion {
+                            if (!scheduleSheetState.isVisible) {
+                                scheduleSheetExpanded = false
+                            }
+                        }
+                    },
+                    sheetState = scheduleSheetState
+                )
             }
 
             SectionSchedule(section.schedules[selectedScheduleIndex])
@@ -285,14 +284,14 @@ fun SectionSchedule(
             SectionScheduleRow(
                 rowIconID = R.drawable.material_icon_calendar_clock,
                 rowIconDescription = R.string.datetime_icon_desc,
-                rowContent = schedule.dateTimes.joinToString("; ")
+                rowContent = schedule.dateTimes
             )
 
             // Venue
             SectionScheduleRow(
                 rowIconID = R.drawable.material_icon_location,
                 rowIconDescription = R.string.venue_icon_desc,
-                rowContent = schedule.venue.joinToString("; ")
+                rowContent = schedule.venue
             )
 
             // Instructor
@@ -417,7 +416,7 @@ fun ReservedQuotaRow(
     reservedQuota: ReservedQuota
 ) {
     val reservedQuotaDept: String = reservedQuota.dept
-    val reservedQuotas: List<Int> = listOf(reservedQuota.quota, reservedQuota.enrol, reservedQuota.enrol)
+    val reservedQuotas: List<Int> = listOf(reservedQuota.quota, reservedQuota.enrol, reservedQuota.avail)
 
     Row(
         modifier = Modifier.fillMaxWidth(),

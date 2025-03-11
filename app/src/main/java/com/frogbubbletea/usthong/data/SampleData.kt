@@ -40,8 +40,15 @@ val samplePrefixes: List<Prefix> = listOf(
 
 val sampleCourses: List<Course> = listOf(
     Course(
-        prefix = "COMP",
+        prefix = Prefix(
+            name = "COMP",
+            type = PrefixType.UG
+        ),
         code = "2012",
+        semester = Semester(
+            name = "2024-25 Summer",
+            code = 2440
+        ),
         title = "Object-Oriented Programming and Data Structures",
         units = 4,
         matching = MatchingRequirement.LAB,
@@ -62,8 +69,8 @@ val sampleCourses: List<Course> = listOf(
                 schedules = listOf(
                     SectionSchedule(
                         effectivePeriod = "MoWe 09:00AM - 10:20AM",
-                        dateTimes = listOf("MoWe 09:00AM - 10:20AM"),
-                        venue = listOf("Rm 2464, Lift 25-26 (122)"),
+                        dateTimes = "MoWe 09:00AM - 10:20AM",
+                        venue = "Rm 2464, Lift 25-26 (122)",
                         instructors = listOf("PAPADOPOULOS, Dimitris"),
                         teachingAssistants = listOf()
                     )
@@ -83,8 +90,8 @@ val sampleCourses: List<Course> = listOf(
                 schedules = listOf(
                     SectionSchedule(
                         effectivePeriod = "MoWe 10:30AM - 11:50AM",
-                        dateTimes = listOf("MoWe 10:30AM - 11:50AM"),
-                        venue = listOf("Rm 2464, Lift 25-26 (122)"),
+                        dateTimes = "MoWe 10:30AM - 11:50AM",
+                        venue = "Rm 2464, Lift 25-26 (122)",
                         instructors = listOf("SANDER, Pedro"),
                         teachingAssistants = listOf()
                     )
@@ -104,8 +111,8 @@ val sampleCourses: List<Course> = listOf(
                 schedules = listOf(
                     SectionSchedule(
                         effectivePeriod = "TuTh 04:30PM - 05:50PM",
-                        dateTimes = listOf("TuTh 04:30PM - 05:50PM"),
-                        venue = listOf("Rm 2407, Lift 17-18 (126)"),
+                        dateTimes = "TuTh 04:30PM - 05:50PM",
+                        venue = "Rm 2407, Lift 17-18 (126)",
                         instructors = listOf("TSOI, Yau Chat"),
                         teachingAssistants = listOf()
                     )
@@ -125,8 +132,8 @@ val sampleCourses: List<Course> = listOf(
                 schedules = listOf(
                     SectionSchedule(
                         effectivePeriod = "WeFr 04:30PM - 05:50PM",
-                        dateTimes = listOf("WeFr 04:30PM - 05:50PM"),
-                        venue = listOf("Rm 2502, Lift 25-26 (120)"),
+                        dateTimes = "WeFr 04:30PM - 05:50PM",
+                        venue = "Rm 2502, Lift 25-26 (120)",
                         instructors = listOf("CHAN, Ki Cecia"),
                         teachingAssistants = listOf()
                     )
@@ -146,8 +153,8 @@ val sampleCourses: List<Course> = listOf(
                 schedules = listOf(
                     SectionSchedule(
                         effectivePeriod = "Fr 10:30AM - 12:20PM",
-                        dateTimes = listOf("Fr 10:30AM - 12:20PM"),
-                        venue = listOf("Rm 2502, Lift 25-26 (120)"),
+                        dateTimes = "Fr 10:30AM - 12:20PM",
+                        venue = "Rm 2502, Lift 25-26 (120)",
                         instructors = listOf("PAPADOPOULOS, Dimitris"),
                         teachingAssistants = listOf(
                             "CHUNG, Tsz Wa",
@@ -180,8 +187,8 @@ val sampleCourses: List<Course> = listOf(
                 schedules = listOf(
                     SectionSchedule(
                         effectivePeriod = "Mo 03:00PM - 04:50PM",
-                        dateTimes = listOf("Mo 03:00PM - 04:50PM"),
-                        venue = listOf("Rm 2465, Lift 25-26 (122)"),
+                        dateTimes = "Mo 03:00PM - 04:50PM",
+                        venue = "Rm 2465, Lift 25-26 (122)",
                         instructors = listOf("SANDER, Pedro"),
                         teachingAssistants = listOf(
                             "CHUNG, Tsz Wa",
@@ -214,8 +221,8 @@ val sampleCourses: List<Course> = listOf(
                 schedules = listOf(
                     SectionSchedule(
                         effectivePeriod = "Mo 05:30PM - 07:20PM",
-                        dateTimes = listOf("Mo 05:30PM - 07:20PM"),
-                        venue = listOf("Rm 4620, Lift 31-32 (126)"),
+                        dateTimes = "Mo 05:30PM - 07:20PM",
+                        venue = "Rm 4620, Lift 31-32 (126)",
                         instructors = listOf("TSOI, Yau Chat"),
                         teachingAssistants = listOf(
                             "CHUNG, Tsz Wa",
@@ -248,8 +255,8 @@ val sampleCourses: List<Course> = listOf(
                 schedules = listOf(
                     SectionSchedule(
                         effectivePeriod = "Fr 12:30PM - 02:20PM",
-                        dateTimes = listOf("Fr 12:30PM - 02:20PM"),
-                        venue = listOf("Lecture Theater F (133)"),
+                        dateTimes = "Fr 12:30PM - 02:20PM",
+                        venue = "Lecture Theater F (133)",
                         instructors = listOf("CHAN, Ki Cecia"),
                         teachingAssistants = listOf(
                             "CHUNG, Tsz Wa",
@@ -279,8 +286,15 @@ val sampleCourses: List<Course> = listOf(
         )
     ),
     Course(
-        prefix = "ACCT",
+        prefix = Prefix(
+            name = "ACCT",
+            type = PrefixType.UG
+        ),
         code = "5210",
+        semester = Semester(
+            name = "2024-25 Summer",
+            code = 2440
+        ),
         title = "Managerial Accounting Foundations",
         units = 2,
         matching = MatchingRequirement.NONE,
@@ -309,57 +323,57 @@ val sampleCourses: List<Course> = listOf(
                 schedules = listOf(
                     SectionSchedule(
                         effectivePeriod = "16-FEB-2025 - 16-FEB-2025",
-                        dateTimes = listOf("Su 09:00AM - 12:20PM"),
-                        venue = listOf("Rm 2001, LSK Bldg"),
+                        dateTimes = "Su 09:00AM - 12:20PM",
+                        venue = "Rm 2001, LSK Bldg",
                         instructors = listOf("SHIEH, Tony"),
                         teachingAssistants = listOf("CHEUNG, Mandy")
                     ),
                     SectionSchedule(
                         effectivePeriod = "16-FEB-2025 - 16-FEB-2025",
-                        dateTimes = listOf("Su 02:00PM - 05:20PM"),
-                        venue = listOf("Rm 2001, LSK Bldg"),
+                        dateTimes = "Su 02:00PM - 05:20PM",
+                        venue = "Rm 2001, LSK Bldg",
                         instructors = listOf("SHIEH, Tony"),
                         teachingAssistants = listOf()
                     ),
                     SectionSchedule(
                         effectivePeriod = "02-MAR-2025 - 02-MAR-2025",
-                        dateTimes = listOf("Su 09:00AM - 12:20PM"),
-                        venue = listOf("Rm 2001, LSK Bldg"),
+                        dateTimes = "Su 09:00AM - 12:20PM",
+                        venue = "Rm 2001, LSK Bldg",
                         instructors = listOf("SHIEH, Tony"),
                         teachingAssistants = listOf()
                     ),
                     SectionSchedule(
                         effectivePeriod = "02-MAR-2025 - 02-MAR-2025",
-                        dateTimes = listOf("Su 02:00PM - 05:20PM"),
-                        venue = listOf("Rm 2001, LSK Bldg"),
+                        dateTimes = "Su 02:00PM - 05:20PM",
+                        venue = "Rm 2001, LSK Bldg",
                         instructors = listOf("SHIEH, Tony"),
                         teachingAssistants = listOf()
                     ),
                     SectionSchedule(
                         effectivePeriod = "16-MAR-2025 - 16-MAR-2025",
-                        dateTimes = listOf("Su 09:00AM - 12:20PM"),
-                        venue = listOf("Rm 2001, LSK Bldg"),
+                        dateTimes = "Su 09:00AM - 12:20PM",
+                        venue = "Rm 2001, LSK Bldg",
                         instructors = listOf("SHIEH, Tony"),
                         teachingAssistants = listOf()
                     ),
                     SectionSchedule(
                         effectivePeriod = "16-MAR-2025 - 16-MAR-2025",
-                        dateTimes = listOf("Su 02:00PM - 05:20PM"),
-                        venue = listOf("Rm 2001, LSK Bldg"),
+                        dateTimes = "Su 02:00PM - 05:20PM",
+                        venue = "Rm 2001, LSK Bldg",
                         instructors = listOf("SHIEH, Tony"),
                         teachingAssistants = listOf()
                     ),
                     SectionSchedule(
                         effectivePeriod = "30-MAR-2025 - 30-MAR-2025",
-                        dateTimes = listOf("Su 09:00AM - 12:20PM"),
-                        venue = listOf("Rm 2001, LSK Bldg"),
+                        dateTimes = "Su 09:00AM - 12:20PM",
+                        venue = "Rm 2001, LSK Bldg",
                         instructors = listOf("SHIEH, Tony"),
                         teachingAssistants = listOf()
                     ),
                     SectionSchedule(
                         effectivePeriod = "30-MAR-2025 - 30-MAR-2025",
-                        dateTimes = listOf("Su 02:00PM - 05:20PM"),
-                        venue = listOf("Rm 2001, LSK Bldg"),
+                        dateTimes = "Su 02:00PM - 05:20PM",
+                        venue = "Rm 2001, LSK Bldg",
                         instructors = listOf("SHIEH, Tony"),
                         teachingAssistants = listOf()
                     ),

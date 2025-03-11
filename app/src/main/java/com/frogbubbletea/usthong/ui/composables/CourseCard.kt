@@ -29,6 +29,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.CourseScreenActivity
 import com.frogbubbletea.usthong.R
 import com.frogbubbletea.usthong.data.Course
+import com.frogbubbletea.usthong.data.Semester
 import com.frogbubbletea.usthong.data.sampleCourses
 import com.frogbubbletea.usthong.ui.theme.USThongTheme
 import kotlinx.coroutines.launch
@@ -67,14 +69,20 @@ fun CourseCard(
     var showSectionSheet by remember { mutableStateOf(false) }
     var selectedSection by remember { mutableStateOf(sections[0]) }
 
+    LaunchedEffect(sections) {
+        selectedSection = sections[0]
+    }
+
     val context = LocalContext.current
 
     Surface(
 //        onClick = onClick,
         onClick = {
             val courseCardIntent = Intent(context, CourseScreenActivity::class.java)
-            courseCardIntent.putExtra("prefix", course.prefix)
+            courseCardIntent.putExtra("prefixName", course.prefix.name)
+            courseCardIntent.putExtra("prefixType", course.prefix.type.toString())
             courseCardIntent.putExtra("code", course.code)
+            courseCardIntent.putExtra("semesterCode", course.semester.code.toString())
             context.startActivity(courseCardIntent)
         },
         modifier = Modifier
@@ -89,7 +97,7 @@ fun CourseCard(
         ) {
             // Course code
             Text(
-                text = "${course.prefix} ${course.code}",
+                text = "${course.prefix.name} ${course.code}",
                 style = MaterialTheme.typography.titleLarge
             )
 

@@ -64,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.CourseScreenActivity
 import com.frogbubbletea.usthong.R
 import com.frogbubbletea.usthong.StarredScreenActivity
+import com.frogbubbletea.usthong.data.Course
 import com.frogbubbletea.usthong.data.Prefix
 import com.frogbubbletea.usthong.data.PrefixType
 import com.frogbubbletea.usthong.data.Semester
@@ -86,11 +87,12 @@ fun PrefixScreen() {
     // Sample data
 //    val semesters = sampleSemesters
 //     val prefixes = samplePrefixes
-    val courses = sampleCourses
+//    val courses = sampleCourses
 
     // Variables for course data
     var prefixes: List<Prefix> by rememberSaveable { mutableStateOf(listOf()) }  // Course code prefixes
     var semesters: List<Semester> by rememberSaveable { mutableStateOf(listOf()) }  // Semesters
+    var courses: List<Course> by rememberSaveable { mutableStateOf(listOf()) }  // Courses
     var error: String by rememberSaveable { mutableStateOf("") }  // Error message
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
@@ -120,34 +122,37 @@ fun PrefixScreen() {
 
     // Load course data
     var scraping by rememberSaveable { mutableStateOf(ScrapingStatus.LOADING) }
-    if (scraping == ScrapingStatus.LOADING) {
-        LaunchedEffect(selectedSemester, selectedPrefix) {
+//    if (scraping == ScrapingStatus.LOADING) {
+    LaunchedEffect(selectedSemester, selectedPrefix) {
 //        scraping = ScrapingStatus.LOADING
-            try {
-                // Perform course data scraping
-                val scrapeResult = scrapeCourses(
-                    prefix = if (selectedPrefix.name == "") null else selectedPrefix,
-                    semester = if (selectedSemester.code == 0) null else selectedSemester
-                )
+        try {
+            // Perform course data scraping
+            val scrapeResult = scrapeCourses(
+                prefix = if (selectedPrefix.name == "") null else selectedPrefix,
+                semester = if (selectedSemester.code == 0) null else selectedSemester
+            )
 
-                // Unpack scraped data
-                prefixes = scrapeResult.prefixes
-                semesters = scrapeResult.semesters
+            // Unpack scraped data
+            prefixes = scrapeResult.prefixes
+            semesters = scrapeResult.semesters
+            courses = scrapeResult.courses
 
-                // Assign first prefix and latest semester after initial scrape
+//            println(courses)  // DEBUG PRINT
+
+            // Assign first prefix and latest semester after initial scrape
 //            if (selectedPrefix.name == "")
 //                selectedPrefix = prefixes[0]
 //            if (selectedSemester.code == 0)
 //                selectedSemester = semesters[0]
-                selectedPrefix = scrapeResult.scrapedPrefix
-                selectedSemester = scrapeResult.scrapedSemester
+            selectedPrefix = scrapeResult.scrapedPrefix
+            selectedSemester = scrapeResult.scrapedSemester
 
-                scraping = ScrapingStatus.SUCCESS
-            } catch (e: Exception) {
-                scraping = ScrapingStatus.ERROR
-                error = e.stackTraceToString()
-            }
+            scraping = ScrapingStatus.SUCCESS
+        } catch (e: Exception) {
+            scraping = ScrapingStatus.ERROR
+            error = e.stackTraceToString()
         }
+//        }
     }
 
     Scaffold(
@@ -338,7 +343,7 @@ fun PrefixScreen() {
         ) {
             CourseList(
                 innerPadding = innerPadding,
-                courses = courses
+                courses = courses,
             )
         }
     }

@@ -1,5 +1,9 @@
 package com.frogbubbletea.usthong.data
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class Section(
     val code: String,  // L1
     val classNbr: Int,  // 2041
@@ -7,4 +11,4 @@ data class Section(
     val totalQuota: Quota,  // Quota of a section
     val reservedQuotas: List<ReservedQuota>,  // Reserved quotas of a section
     val remarks: Map<String, String>,  // { Consent: Instructor Consent Required }
-)
+): Parcelable

@@ -13,13 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.frogbubbletea.usthong.data.Course
+import com.frogbubbletea.usthong.data.Semester
 
 // Format a list of courses into a `LazyColumn` of  `CourseCard`s
 @Composable
 fun CourseList(
     innerPadding: PaddingValues,
     // TODO: Add parameter to make it accept a list of course data
-    courses: List<Course>
+    courses: List<Course>,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -29,7 +30,9 @@ fun CourseList(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(courses) { course ->
-            CourseCard(course)
+            CourseCard(
+                course = course,
+            )
         }
 
         // Reserve space for system navbar
