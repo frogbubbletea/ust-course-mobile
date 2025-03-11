@@ -46,6 +46,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -88,9 +89,9 @@ fun PrefixScreen() {
     val courses = sampleCourses
 
     // Variables for course data
-    var prefixes: List<Prefix> by remember { mutableStateOf(listOf()) }  // Course code prefixes
-    var semesters: List<Semester> by remember { mutableStateOf(listOf()) }  // Semesters
-    var error: String by remember { mutableStateOf("") }  // Error message
+    var prefixes: List<Prefix> by rememberSaveable { mutableStateOf(listOf()) }  // Course code prefixes
+    var semesters: List<Semester> by rememberSaveable { mutableStateOf(listOf()) }  // Semesters
+    var error: String by rememberSaveable { mutableStateOf("") }  // Error message
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         state = rememberTopAppBarState(),
@@ -98,16 +99,16 @@ fun PrefixScreen() {
     )
 
     // Variables to control explore menu
-    var showExploreMenu by remember { mutableStateOf(false) }
+    var showExploreMenu by rememberSaveable { mutableStateOf(false) }
     val exploreMenuState = rememberModalBottomSheetState()
     val exploreMenuScope = rememberCoroutineScope()
-    var selectedSemester by remember { mutableStateOf(
+    var selectedSemester by rememberSaveable { mutableStateOf(
         Semester(
             name = "",
             code = 0
         )
     ) }
-    var selectedPrefix by remember { mutableStateOf(
+    var selectedPrefix by rememberSaveable { mutableStateOf(
         Prefix(
             name = "",
             type = PrefixType.UNDEFINED,
@@ -118,32 +119,34 @@ fun PrefixScreen() {
     val prefixScreenContext = LocalContext.current
 
     // Load course data
-    var scraping by remember { mutableStateOf(ScrapingStatus.LOADING) }
-    LaunchedEffect(selectedSemester, selectedPrefix) {
-        scraping = ScrapingStatus.LOADING
-        try {
-            // Perform course data scraping
-            val scrapeResult = scrapeCourses(
-                prefix = if (selectedPrefix.name == "") null else selectedPrefix,
-                semester = if (selectedSemester.code == 0) null else selectedSemester
-            )
+    var scraping by rememberSaveable { mutableStateOf(ScrapingStatus.LOADING) }
+    if (scraping == ScrapingStatus.LOADING) {
+        LaunchedEffect(selectedSemester, selectedPrefix) {
+//        scraping = ScrapingStatus.LOADING
+            try {
+                // Perform course data scraping
+                val scrapeResult = scrapeCourses(
+                    prefix = if (selectedPrefix.name == "") null else selectedPrefix,
+                    semester = if (selectedSemester.code == 0) null else selectedSemester
+                )
 
-            // Unpack scraped data
-            prefixes = scrapeResult.prefixes
-            semesters = scrapeResult.semesters
+                // Unpack scraped data
+                prefixes = scrapeResult.prefixes
+                semesters = scrapeResult.semesters
 
-            // Assign first prefix and latest semester after initial scrape
+                // Assign first prefix and latest semester after initial scrape
 //            if (selectedPrefix.name == "")
 //                selectedPrefix = prefixes[0]
 //            if (selectedSemester.code == 0)
 //                selectedSemester = semesters[0]
-            selectedPrefix = scrapeResult.scrapedPrefix
-            selectedSemester = scrapeResult.scrapedSemester
+                selectedPrefix = scrapeResult.scrapedPrefix
+                selectedSemester = scrapeResult.scrapedSemester
 
-            scraping = ScrapingStatus.SUCCESS
-        } catch (e: Exception) {
-            scraping = ScrapingStatus.ERROR
-            error = e.stackTraceToString()
+                scraping = ScrapingStatus.SUCCESS
+            } catch (e: Exception) {
+                scraping = ScrapingStatus.ERROR
+                error = e.stackTraceToString()
+            }
         }
     }
 
@@ -256,6 +259,7 @@ fun PrefixScreen() {
                     }
                 },
                 onSelectSem = { semester ->
+                    scraping = ScrapingStatus.LOADING
                     selectedSemester = semester
                     exploreMenuScope.launch { exploreMenuState.hide() }.invokeOnCompletion {
                         if (!exploreMenuState.isVisible) {
@@ -264,6 +268,7 @@ fun PrefixScreen() {
                     }
                 },
                 onSelectPrefix = { prefix ->
+                    scraping = ScrapingStatus.LOADING
                     selectedPrefix = prefix
                     exploreMenuScope.launch { exploreMenuState.hide() }.invokeOnCompletion {
                         if (!exploreMenuState.isVisible) {
