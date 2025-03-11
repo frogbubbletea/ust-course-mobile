@@ -3,7 +3,10 @@ package com.frogbubbletea.usthong.network
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.network.parseGetRequest
 import com.fleeksoft.ksoup.nodes.Document
+import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.select.Elements
+import com.frogbubbletea.usthong.data.Course
+import com.frogbubbletea.usthong.data.MatchingRequirement
 import com.frogbubbletea.usthong.data.Prefix
 import com.frogbubbletea.usthong.data.PrefixType
 import com.frogbubbletea.usthong.data.Semester
@@ -72,6 +75,59 @@ suspend fun scrapeCourses(
         semester
     } else {
         semesters[0]
+    }
+
+    // Get courses of page
+    val coursesRaw: Elements = page.select("#classes > .course")
+    val courses = coursesRaw.map { course ->
+        // Extract course code
+        val fullCode: String? = course.select(".courseanchor > a").first()?.attr("name")
+        val coursePrefix: String = fullCode?.substring(0, 4) ?: ""  // Course.prefix
+        val suffixCode: String = fullCode?.substring(4) ?: ""  // Course.code
+
+        // Extract title and units
+        val titleAndUnits: String = course.select(".courseinfo > .courseattrContainer > .subject").first()?.text() ?: ""
+        val unitsRegex = Regex("\\(\\d units*\\)")
+        val unitsText: String? = unitsRegex.find(titleAndUnits)?.value
+        val units: Int = unitsText?.substring(1, 2)?.toInt() ?: 0  // Course.units
+        val title: String = unitsRegex.replace(titleAndUnits, "").trim()  // Course.title
+
+        // Extract matching requirements if any
+        val matchingRaw: String? = course.select(".courseinfo > .courseattrContainer > .matching").first()?.text()
+        val matching: MatchingRequirement = when (matchingRaw) {  // Course.matching
+            "[Matching between Lecture & Tutorial required]" -> MatchingRequirement.TUTORIAL
+            "[Matching between Lecture & Lab required]" -> MatchingRequirement.LAB
+            else -> MatchingRequirement.NONE
+        }
+
+        // Extract attributes
+        // #classes > div:nth-child(1) > div.courseinfo > div.courseattrContainer > div:nth-child(2)
+        val attrsRaw: Elements = course.select(".courseinfo > .courseattrContainer > .popup.attrword")
+        val attributes = mutableMapOf<String, String>()  // Course.attributes
+        attrsRaw.forEach { attr ->
+            val attrTitleRegex = Regex("\\[|\\]")
+            val attrTitle: String = attrTitleRegex.replace(
+                input = attr.selectFirst(".crseattrword")?.text() ?: "",
+                replacement = ""
+            )
+            val attrContent: String = attr.selectFirst(".popupdetail")?.text() ?: ""
+            attributes.put(attrTitle, attrContent)
+        }
+
+        // Extract course info
+        val infoTable: Element? = course.selectFirst(".courseinfo > .courseattr > .popupdetail > table")
+        val infoRows: Elements? = infoTable?.select("tbody > tr")
+        val info = mutableMapOf<String, String>()  // Course.info
+        infoRows?.forEach { infoRow ->
+            val infoTitle: String = infoRow.selectFirst("th")?.text() ?: ""
+            val infoContent: String = infoRow.selectFirst("td")?.text() ?: ""
+            info.put(infoTitle, infoContent)
+        }
+
+        // Extract sections
+        val sectionsTable: Element? = course.selectFirst(".sections > tbody")
+        val sectionsRows: Elements? = sectionsTable?.select(".newsect.secteven, .newsect.sectodd, .secteven, .sectodd")
+        // TODO: continue extracting sections
     }
 
     return ScrapeResult(
