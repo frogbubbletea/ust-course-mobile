@@ -1,4 +1,4 @@
-# USThong
+# ust-course-mobile
 Get HKUST Class Schedule & Quota wherever you go!
 
 > [!WARNING]
