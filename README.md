@@ -2,7 +2,7 @@
 Get HKUST Class Schedule & Quota wherever you go!
 
 > [!WARNING]
-> Work in progress! If you run into any problems with the app, please open an issue here or report on our [Discord server](https://discord.gg/RNmMMF6xHY).
+> Work in progress! If you run into any problems with the app, please open an issue here or report on [Discord](https://discord.gg/RNmMMF6xHY).
 
 ## 🩴 Features
 - Browse course schedules and quotas on your Android device
