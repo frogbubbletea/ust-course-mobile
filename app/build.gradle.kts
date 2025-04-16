@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "com.frogbubbletea.usthong"
+    namespace = "com.frogbubbletea.ustcoursemobile"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.frogbubbletea.usthong"
+        applicationId = "com.frogbubbletea.ustcoursemobile"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

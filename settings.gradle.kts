@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "USThong"
+rootProject.name = "UST Course Mobile"
 include(":app")
  
