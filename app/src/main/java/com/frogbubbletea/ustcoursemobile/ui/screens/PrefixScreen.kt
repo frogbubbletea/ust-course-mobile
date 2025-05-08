@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
@@ -89,6 +90,9 @@ fun PrefixScreen() {
         snapAnimationSpec = null
     )
 
+    // State to reset scroll position on semester/prefix change
+    val courseListState = rememberLazyListState()
+
     // Variables to control explore menu
     var showExploreMenu by rememberSaveable { mutableStateOf(false) }
     val exploreMenuState = rememberModalBottomSheetState()
@@ -137,6 +141,9 @@ fun PrefixScreen() {
 //                selectedSemester = semesters[0]
             selectedPrefix = scrapeResult.scrapedPrefix
             selectedSemester = scrapeResult.scrapedSemester
+
+            // Scroll to top for changed course list
+            courseListState.requestScrollToItem(0)
 
             scraping = ScrapingStatus.SUCCESS
         } catch (e: Exception) {
@@ -386,6 +393,7 @@ fun PrefixScreen() {
             CourseList(
                 innerPadding = innerPadding,
                 courses = courses,
+                listState = courseListState
             )
         }
     }
