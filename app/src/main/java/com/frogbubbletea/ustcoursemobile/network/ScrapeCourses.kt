@@ -89,7 +89,16 @@ suspend fun scrapeCourses(
         val suffixCode: String = fullCode?.substring(4) ?: ""  // Course.code
 
         // Extract title and units
-        val titleAndUnits: String = course.select(".courseinfo > .courseattrContainer > .subject").first()?.text()?.split("-")?.last()?.trim() ?: ""
+        val titleAndUnits: String = course
+            .select(".courseinfo > .courseattrContainer > .subject")
+            .first()
+            ?.text()
+            ?.split(
+                "-",
+                limit = 2
+            )
+            ?.last()
+            ?.trim() ?: ""
         val unitsRegex = Regex("\\(\\d units*\\)")
         val unitsText: String? = unitsRegex.find(titleAndUnits)?.value
         val units: Int = unitsText?.substring(1, 2)?.toInt() ?: 0  // Course.units
