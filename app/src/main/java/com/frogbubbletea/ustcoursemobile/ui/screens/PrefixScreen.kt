@@ -102,10 +102,12 @@ fun PrefixScreen() {
     val prefixScreenContext = LocalContext.current
 
     // Load course data
+    var loadingTrigger by rememberSaveable { mutableStateOf(false) }
     var scraping by rememberSaveable { mutableStateOf(ScrapingStatus.LOADING) }
 //    if (scraping == ScrapingStatus.LOADING) {
-    LaunchedEffect(selectedSemester, selectedPrefix) {
-//        scraping = ScrapingStatus.LOADING
+    LaunchedEffect(loadingTrigger) {
+        scraping = ScrapingStatus.LOADING
+
         try {
             // Perform course data scraping
             val scrapeResult = scrapeCourses(
@@ -245,7 +247,7 @@ fun PrefixScreen() {
                     }
                 },
                 onSelectSem = { semester ->
-                    scraping = ScrapingStatus.LOADING
+                    loadingTrigger = !loadingTrigger
                     selectedSemester = semester
                     exploreMenuScope.launch { exploreMenuState.hide() }.invokeOnCompletion {
                         if (!exploreMenuState.isVisible) {
@@ -254,7 +256,7 @@ fun PrefixScreen() {
                     }
                 },
                 onSelectPrefix = { prefix ->
-                    scraping = ScrapingStatus.LOADING
+                    loadingTrigger = !loadingTrigger
                     selectedPrefix = prefix
                     exploreMenuScope.launch { exploreMenuState.hide() }.invokeOnCompletion {
                         if (!exploreMenuState.isVisible) {
