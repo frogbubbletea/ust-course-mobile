@@ -15,4 +15,5 @@
     <string name="remarks_icon_desc">Remarks</string>
     <string name="explore_icon_desc">Semesters and prefixes</string>
     <string name="back_icon_desc">Back</string>
+    <string name="error_icon_desc">Error</string>
 </resources>
