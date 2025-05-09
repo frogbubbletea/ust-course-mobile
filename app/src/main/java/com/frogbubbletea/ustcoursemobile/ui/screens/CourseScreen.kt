@@ -72,6 +72,7 @@ import com.frogbubbletea.ustcoursemobile.data.sampleCourses
 import com.frogbubbletea.ustcoursemobile.data.semesterCodeToInstance
 import com.frogbubbletea.ustcoursemobile.network.ScrapingStatus
 import com.frogbubbletea.ustcoursemobile.network.scrapeCourses
+import com.frogbubbletea.ustcoursemobile.ui.composables.ConnectionErrorDialog
 import com.frogbubbletea.ustcoursemobile.ui.composables.SectionCard
 import com.frogbubbletea.ustcoursemobile.ui.theme.USThongTheme
 
@@ -123,9 +124,11 @@ fun CourseScreen() {
     )
 
     // Load course data
+    var loadingTrigger by rememberSaveable { mutableStateOf(false) }
     var scrapingStatus by rememberSaveable { mutableStateOf(ScrapingStatus.LOADING) }
+    LaunchedEffect(loadingTrigger) {
+        scrapingStatus = ScrapingStatus.LOADING
 
-    LaunchedEffect(null) {
         try {
             // Perform course data scraping
             val scrapeResult = scrapeCourses(
@@ -224,24 +227,29 @@ fun CourseScreen() {
         }
 
         if (scrapingStatus == ScrapingStatus.ERROR) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                item {
-                    Text(fromPrefix.toString())
-                }
-                item {
-                    Text(fromCode)
-                }
-                item {
-                    Text(fromSemester.toString())
-                }
-                item {
-                    Text(error)
-                }
-            }
+//            LazyColumn(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(innerPadding)
+//            ) {
+//                item {
+//                    Text(fromPrefix.toString())
+//                }
+//                item {
+//                    Text(fromCode)
+//                }
+//                item {
+//                    Text(fromSemester.toString())
+//                }
+//                item {
+//                    Text(error)
+//                }
+//            }
+
+            ConnectionErrorDialog(
+                stackTrace = error,
+                retryFunction = { loadingTrigger = !loadingTrigger }
+            )
         }
 
         AnimatedVisibility(
