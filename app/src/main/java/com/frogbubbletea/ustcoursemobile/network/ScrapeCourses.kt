@@ -131,10 +131,27 @@ suspend fun scrapeCourses(
         val infoRows: Elements? = infoTable?.select("tbody > tr")
         val info = mutableMapOf<String, String>()  // Course.info
         infoRows?.forEach { infoRow ->
-            // Convert title to title case
-            val infoTitle: String = infoRow.selectFirst("th")?.text()?.lowercase()?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() } ?: ""
-            val infoContent: String = infoRow.selectFirst("td")?.text() ?: ""
-            info[infoTitle] = infoContent
+            // Convert title to title case, do not add course info entries without a title
+            val infoTitle: String? = infoRow.selectFirst("th")?.text()?.lowercase()?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+            val infoContentRaw: Element? = infoRow.selectFirst("td")
+
+            // Check if info row contains elements for Intended Learning Outcomes
+            val iloSpan: String? = infoContentRaw?.selectFirst("span")?.text()
+            val iloTableRows: Elements? = infoContentRaw?.selectFirst("table")?.select("tbody > tr")
+
+            if (infoTitle != null) {
+                if (infoContentRaw?.children()
+                        .isNullOrEmpty() || iloSpan == null || iloTableRows.isNullOrEmpty()
+                ) {
+                    info[infoTitle] = infoContentRaw?.wholeText() ?: ""
+                } else {
+                    var iloText: String = "$iloSpan"
+                    iloTableRows.forEach { iloTableRow ->
+                        iloText += "\n${iloTableRow.text()}"
+                    }
+                    info[infoTitle] = iloText
+                }
+            }
         }
 
         // Extract sections
