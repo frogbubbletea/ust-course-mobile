@@ -38,6 +38,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -329,11 +333,29 @@ fun PrefixScreen() {
                 targetOffsetY = { 120 }
             ) + fadeOut()
         ) {
-            CourseList(
-                innerPadding = innerPadding,
-                courses = courses,
-                listState = courseListState
-            )
+            val refreshState = rememberPullToRefreshState()
+
+            PullToRefreshBox(
+                isRefreshing = scraping == ScrapingStatus.LOADING,
+                onRefresh = { loadingTrigger = !loadingTrigger },
+                state = refreshState,
+                indicator = {
+                    Indicator(
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        isRefreshing = scraping == ScrapingStatus.LOADING,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        state = refreshState,
+                    )
+                },
+                modifier = Modifier
+                    .padding(innerPadding)
+            ) {
+                CourseList(
+                    innerPadding = innerPadding,
+                    courses = courses,
+                    listState = courseListState
+                )
+            }
         }
     }
 }

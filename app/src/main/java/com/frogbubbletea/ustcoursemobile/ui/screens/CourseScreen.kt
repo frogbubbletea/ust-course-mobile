@@ -42,6 +42,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -81,8 +84,8 @@ import com.frogbubbletea.ustcoursemobile.ui.theme.USThongTheme
 @Composable
 fun CourseScreen() {
     // Get course from the screen that launched this activity
-    val activity = LocalActivity.current;
-    val intent = activity?.intent;
+    val activity = LocalActivity.current
+    val intent = activity?.intent
 
     val fromPrefixName = intent?.getStringExtra("prefixName") ?: ""
     val fromPrefixType = when (intent?.getStringExtra("prefixType")) {
@@ -264,72 +267,90 @@ fun CourseScreen() {
                 targetOffsetY = { 120 }
             ) + fadeOut()
         ) {
-            LazyColumn(
-                modifier = Modifier.padding(innerPadding),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            val refreshState = rememberPullToRefreshState()
+
+            PullToRefreshBox(
+                isRefreshing = scrapingStatus == ScrapingStatus.LOADING,
+                onRefresh = { loadingTrigger = !loadingTrigger },
+                state = refreshState,
+                indicator = {
+                    Indicator(
+                        modifier = Modifier.align(Alignment.TopCenter),
+                        isRefreshing = scrapingStatus == ScrapingStatus.LOADING,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        state = refreshState,
+                    )
+                },
+                modifier = Modifier
+                    .padding(innerPadding)
             ) {
-                // Course title
-                item {
-                    SelectionContainer {
-                        Text(
-                            text = course.title,
-                            style = MaterialTheme.typography.titleLarge
-                        )
+                LazyColumn(
+//                    modifier = Modifier.padding(innerPadding),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    // Course title
+                    item {
+                        SelectionContainer {
+                            Text(
+                                text = course.title,
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        }
                     }
-                }
 
-                // Course attributes
-                item {
-                    CompositionLocalProvider(
-                        LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
+                    // Course attributes
+                    item {
+                        CompositionLocalProvider(
+                            LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
                         ) {
-                            // Matching requirement
-                            when (course.matching) {
-                                MatchingRequirement.NONE -> Unit
-                                MatchingRequirement.TUTORIAL -> CourseAttribute(
-                                    "Matching (T)",
-                                    "Matching between Lecture & Tutorial required",
-                                    true
-                                )
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                // Matching requirement
+                                when (course.matching) {
+                                    MatchingRequirement.NONE -> Unit
+                                    MatchingRequirement.TUTORIAL -> CourseAttribute(
+                                        "Matching (T)",
+                                        "Matching between Lecture & Tutorial required",
+                                        true
+                                    )
 
-                                MatchingRequirement.LAB -> CourseAttribute(
-                                    "Matching (LA)",
-                                    "Matching between Lecture & Lab required",
-                                    true
-                                )
-                            }
+                                    MatchingRequirement.LAB -> CourseAttribute(
+                                        "Matching (LA)",
+                                        "Matching between Lecture & Lab required",
+                                        true
+                                    )
+                                }
 
-                            // Attributes
-                            course.attributes.map { attr ->
-                                CourseAttribute(attr.key, attr.value)
+                                // Attributes
+                                course.attributes.map { attr ->
+                                    CourseAttribute(attr.key, attr.value)
+                                }
                             }
                         }
                     }
-                }
 
-                // Course info
-                item {
-                    CourseInfoContainer(course.info)
-                }
+                    // Course info
+                    item {
+                        CourseInfoContainer(course.info)
+                    }
 
-                // Sections
-                items(course.sections) { section ->
-                    SectionCard(section)
-                }
+                    // Sections
+                    items(course.sections) { section ->
+                        SectionCard(section)
+                    }
 
-                // Reserve space for system navbar
-                item {
-                    Spacer(
-                        modifier = Modifier
-                            .height(0.dp)
-                            .navigationBarsPadding()
-                    )
+                    // Reserve space for system navbar
+                    item {
+                        Spacer(
+                            modifier = Modifier
+                                .height(0.dp)
+                                .navigationBarsPadding()
+                        )
+                    }
                 }
             }
         }

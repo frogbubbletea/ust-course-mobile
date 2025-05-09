@@ -25,7 +25,7 @@ fun CourseList(
 ) {
     LazyColumn(
         modifier = Modifier
-            .padding(innerPadding)
+//            .padding(innerPadding)
             .fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
