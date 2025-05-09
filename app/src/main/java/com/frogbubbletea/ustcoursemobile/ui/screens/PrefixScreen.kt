@@ -68,6 +68,7 @@ import com.frogbubbletea.ustcoursemobile.network.scrapeCourses
 import com.frogbubbletea.ustcoursemobile.ui.composables.ConnectionErrorDialog
 import com.frogbubbletea.ustcoursemobile.ui.composables.CourseList
 import com.frogbubbletea.ustcoursemobile.ui.composables.ExploreMenu
+import com.frogbubbletea.ustcoursemobile.ui.composables.LoadingIndicatorBox
 import com.frogbubbletea.ustcoursemobile.ui.theme.USThongTheme
 import kotlinx.coroutines.launch
 
@@ -300,23 +301,7 @@ fun PrefixScreen() {
 //            )
 //        }
         if (scraping == ScrapingStatus.LOADING) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                Box(
-                    contentAlignment = Alignment.TopCenter,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .width(32.dp),
-                    )
-                }
-            }
+            LoadingIndicatorBox(innerPadding)
         }
 
         if (scraping == ScrapingStatus.ERROR) {

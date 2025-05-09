@@ -73,6 +73,7 @@ import com.frogbubbletea.ustcoursemobile.data.semesterCodeToInstance
 import com.frogbubbletea.ustcoursemobile.network.ScrapingStatus
 import com.frogbubbletea.ustcoursemobile.network.scrapeCourses
 import com.frogbubbletea.ustcoursemobile.ui.composables.ConnectionErrorDialog
+import com.frogbubbletea.ustcoursemobile.ui.composables.LoadingIndicatorBox
 import com.frogbubbletea.ustcoursemobile.ui.composables.SectionCard
 import com.frogbubbletea.ustcoursemobile.ui.theme.USThongTheme
 
@@ -207,23 +208,25 @@ fun CourseScreen() {
         }
     ) { innerPadding ->
         if (scrapingStatus == ScrapingStatus.LOADING) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                Box(
-                    contentAlignment = Alignment.TopCenter,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .width(32.dp),
-                    )
-                }
-            }
+//            Box(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(innerPadding)
+//            ) {
+//                Box(
+//                    contentAlignment = Alignment.TopCenter,
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .padding(16.dp)
+//                ) {
+//                    CircularProgressIndicator(
+//                        modifier = Modifier
+//                            .width(24.dp),
+//                    )
+//                }
+//            }
+
+            LoadingIndicatorBox(innerPadding)
         }
 
         if (scrapingStatus == ScrapingStatus.ERROR) {
