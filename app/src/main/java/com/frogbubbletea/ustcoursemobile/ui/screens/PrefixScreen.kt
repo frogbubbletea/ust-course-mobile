@@ -65,6 +65,7 @@ import com.frogbubbletea.ustcoursemobile.data.PrefixType
 import com.frogbubbletea.ustcoursemobile.data.Semester
 import com.frogbubbletea.ustcoursemobile.network.ScrapingStatus
 import com.frogbubbletea.ustcoursemobile.network.scrapeCourses
+import com.frogbubbletea.ustcoursemobile.ui.composables.ConnectionErrorDialog
 import com.frogbubbletea.ustcoursemobile.ui.composables.CourseList
 import com.frogbubbletea.ustcoursemobile.ui.composables.ExploreMenu
 import com.frogbubbletea.ustcoursemobile.ui.theme.USThongTheme
@@ -328,57 +329,10 @@ fun PrefixScreen() {
 //                    Text(error)
 //                }
 //            }
-            BasicAlertDialog(
-                onDismissRequest = { loadingTrigger = !loadingTrigger },
-            ) {
-                Surface(
-                    modifier = Modifier.wrapContentWidth().wrapContentHeight(),
-                    shape = MaterialTheme.shapes.extraLarge,
-                    tonalElevation = AlertDialogDefaults.TonalElevation
-                    ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.material_icon_error),
-                            contentDescription = stringResource(id = R.string.error_icon_desc),
-                            modifier = Modifier.size(24.dp),
-                            tint = MaterialTheme.colorScheme.secondary
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Text(
-                            text = "Connection error",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Text(
-                            "Failed to connect to HKUST Class Schedule & Quota.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        TextButton(
-                            onClick = { loadingTrigger = !loadingTrigger },
-                            modifier = Modifier.align(Alignment.End)
-                        ) {
-                            Text(
-                                text = "Retry",
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-
-                    }
-                }
-            }
+            ConnectionErrorDialog(
+                stackTrace = error,
+                retryFunction = { loadingTrigger = !loadingTrigger }
+            )
         }
 
         AnimatedVisibility(
