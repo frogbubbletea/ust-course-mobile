@@ -31,14 +31,19 @@ fun CourseList(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         state = listState
     ) {
-        items(courses) { course ->
+        items(
+            items = courses,
+            key = { it.code }
+        ) { course ->
             CourseCard(
                 course = course,
             )
         }
 
         // Reserve space for system navbar
-        item {
+        item(
+            key = "spacer"
+        ) {
             Spacer(
                 modifier = Modifier
                     .height(0.dp)

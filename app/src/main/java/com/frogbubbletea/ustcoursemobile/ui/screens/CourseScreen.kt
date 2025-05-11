@@ -290,7 +290,7 @@ fun CourseScreen() {
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     // Course title
-                    item {
+                    item(key = "title") {
                         SelectionContainer {
                             Text(
                                 text = course.title,
@@ -300,7 +300,7 @@ fun CourseScreen() {
                     }
 
                     // Course attributes
-                    item {
+                    item(key = "attr") {
                         CompositionLocalProvider(
                             LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
                         ) {
@@ -334,17 +334,20 @@ fun CourseScreen() {
                     }
 
                     // Course info
-                    item {
+                    item(key = "info") {
                         CourseInfoContainer(course.info)
                     }
 
                     // Sections
-                    items(course.sections) { section ->
+                    items(
+                        items = course.sections,
+                        key = { it.classNbr }
+                    ) { section ->
                         SectionCard(section)
                     }
 
                     // Reserve space for system navbar
-                    item {
+                    item(key = "spacer") {
                         Spacer(
                             modifier = Modifier
                                 .height(0.dp)

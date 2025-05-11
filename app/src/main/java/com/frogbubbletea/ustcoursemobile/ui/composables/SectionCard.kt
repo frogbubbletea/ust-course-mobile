@@ -233,7 +233,10 @@ fun ScheduleSelectionMenu(
 
             // Add schedules to the sheet one by one
             LazyColumn {
-                items(schedules.size) { i ->
+                items(
+                    count = schedules.size,
+                    key = { it }
+                ) { i ->
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth(),

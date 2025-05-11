@@ -162,7 +162,10 @@ fun CourseCard(
 
                         // Add sections to the sheet one by one
                         LazyColumn {
-                            items(sections) { section ->
+                            items(
+                                items = sections,
+                                key = { it.classNbr }
+                            ) { section ->
                                 Surface(
                                     modifier = Modifier
                                         .fillMaxWidth(),

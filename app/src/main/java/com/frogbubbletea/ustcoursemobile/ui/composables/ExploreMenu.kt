@@ -77,7 +77,7 @@ fun ExploreMenu(
 //            }
 
             // Select semester
-            item {
+            item(key = "semesters") {
                 Text(
                     text = "Semesters",
                     style = MaterialTheme.typography.bodySmall,
@@ -85,7 +85,10 @@ fun ExploreMenu(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                 )
             }
-            items(semesters) { semester ->
+            items(
+                items = semesters,
+                key = { it.code }
+            ) { semester ->
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -108,14 +111,14 @@ fun ExploreMenu(
                 }
             }
 
-            item {
+            item(key = "divider") {
                 HorizontalDivider(
                     modifier = Modifier.padding(top = 8.dp, bottom = 8.dp)
                 )
             }
 
             // Select prefix
-            item {
+            item(key = "prefixes") {
                 Text(
                     text = "Prefixes",
                     style = MaterialTheme.typography.bodySmall,
@@ -123,7 +126,10 @@ fun ExploreMenu(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                 )
             }
-            items(prefixes) { prefix ->
+            items(
+                items = prefixes,
+                key = { it.name }
+            ) { prefix ->
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth(),
