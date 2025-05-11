@@ -51,10 +51,10 @@ suspend fun scrapeCourses(
 
     // Get course code prefixes
     val prefixesRaw: Elements = page.select(".depts > #subjectItems > a")
-    val prefixes: List<Prefix> = prefixesRaw.map { prefix ->
+    val prefixes: List<Prefix> = prefixesRaw.map { p ->
         Prefix(
-            name = prefix.text(),
-            type = when(prefix.className()) {
+            name = p.text(),
+            type = when(p.className()) {
                 "ug" -> PrefixType.UG
                 "pg" -> PrefixType.PG
                 else -> PrefixType.UNDEFINED
@@ -63,6 +63,8 @@ suspend fun scrapeCourses(
     }
     val scrapedPrefix = if (prefix != null && prefix in prefixes) {
         prefix
+    } else if (prefix != null && (prefix.name in prefixes.map { p -> p.name })) {  // Get the prefix from prefixes list if prefix type is not given
+        prefixes.find { p -> prefix.name == p.name} ?: prefixes[0]
     } else {
         prefixes[0]
     }
@@ -70,10 +72,10 @@ suspend fun scrapeCourses(
     // Get semesters
     // body > div:nth-child(2) > div > div.term.show > div.dropdown-menu.dropdown-menu-right.show > a:nth-child(1)
     val semestersRaw: Elements = page.select(".search-box > .term > .dropdown-menu > .dropdown-item")
-    val semesters: List<Semester> = semestersRaw.map { semester ->
+    val semesters: List<Semester> = semestersRaw.map { s ->
         Semester(
-            name = semester.text(),
-            code = semester.attr("href").split("/").takeLast(2)[0].toInt()
+            name = s.text(),
+            code = s.attr("href").split("/").takeLast(2)[0].toInt()
         )
     }
     val scrapedSemester = if (semester != null && semester in semesters) {

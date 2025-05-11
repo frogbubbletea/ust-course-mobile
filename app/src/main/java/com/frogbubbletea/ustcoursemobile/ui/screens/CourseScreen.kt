@@ -1,5 +1,6 @@
 package com.frogbubbletea.ustcoursemobile.ui.screens
 
+import android.content.Intent
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
@@ -61,11 +62,18 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.frogbubbletea.ustcoursemobile.CourseScreenActivity
 import com.frogbubbletea.ustcoursemobile.R
 import com.frogbubbletea.ustcoursemobile.data.Course
 import com.frogbubbletea.ustcoursemobile.data.MatchingRequirement
@@ -74,13 +82,17 @@ import com.frogbubbletea.ustcoursemobile.data.PrefixType
 import com.frogbubbletea.ustcoursemobile.data.Semester
 import com.frogbubbletea.ustcoursemobile.data.sampleCourses
 import com.frogbubbletea.ustcoursemobile.data.semesterCodeToInstance
+import com.frogbubbletea.ustcoursemobile.network.ScrapeResult
 import com.frogbubbletea.ustcoursemobile.network.ScrapingStatus
 import com.frogbubbletea.ustcoursemobile.network.scrapeCourses
 import com.frogbubbletea.ustcoursemobile.ui.composables.ConnectionErrorDialog
+import com.frogbubbletea.ustcoursemobile.ui.composables.CourseNotFoundDialog
 import com.frogbubbletea.ustcoursemobile.ui.composables.LoadingIndicatorBox
 import com.frogbubbletea.ustcoursemobile.ui.composables.SectionCard
 import com.frogbubbletea.ustcoursemobile.ui.theme.USThongTheme
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -143,13 +155,53 @@ fun CourseScreen() {
                 semester = if (fromSemesterCode == "") null else fromSemester
             )
 
-            // Filter scraped data
-            course = scrapeResult.courses.filter { course ->
-                (course.prefix == fromPrefix) && (course.code == fromCode) && (course.semester == fromSemester)
-            }.first()
+            // Find target course from scraped data
+            val targetCourses: ImmutableList<Course> = scrapeResult.courses
+                .filter { course ->
+                    (course.prefix.name == fromPrefix.name) && (course.code == fromCode) && (course.semester == fromSemester)
+                }
+                .toImmutableList()
+
+            // Find target course from all semesters (for course info links)
+            if (targetCourses.isEmpty()) {
+                val scrapedSemesters: ImmutableList<Semester> = scrapeResult.semesters.toImmutableList()
+                for (s: Semester in scrapedSemesters) {
+                    try {
+                        val newScrapeResult: ScrapeResult = scrapeCourses(
+                            prefix = if (fromPrefixName == "") null else fromPrefix,
+                            semester = s
+                        )
+                        val newTargetCourses: ImmutableList<Course> = newScrapeResult.courses
+                            .filter { c ->
+                                (c.prefix.name == fromPrefix.name) && (c.code == fromCode) && (c.semester == s)
+                            }
+                            .toImmutableList()
+
+                        if (newTargetCourses.isEmpty()) {
+                            continue
+                        } else {
+                            course = newTargetCourses.first()
+                            break
+                        }
+                    } catch (e: Exception) {
+                        continue
+                    }
+                }
+
+                // Display error if course is not found in all available semesters
+                if (course.code == "") {
+                    throw IllegalArgumentException("Course not found in all available semesters.")
+                }
+            } else {
+                course = targetCourses.first()
+            }
 
             scrapingStatus = ScrapingStatus.SUCCESS
-        } catch (e: Exception) {
+        } catch (e: IllegalArgumentException) {
+            scrapingStatus = ScrapingStatus.ERROR
+            error = "courseNotFound"
+        }
+        catch (e: Exception) {
             scrapingStatus = ScrapingStatus.ERROR
             error = e.stackTraceToString()
         }
@@ -255,10 +307,16 @@ fun CourseScreen() {
 //                }
 //            }
 
-            ConnectionErrorDialog(
-                stackTrace = error,
-                retryFunction = { loadingTrigger = !loadingTrigger }
-            )
+            when (error) {
+                "courseNotFound" -> CourseNotFoundDialog(
+                    courseCode = fromPrefix.name + fromCode,
+                    exitFunction = { activity?.finish() }
+                )
+                else -> ConnectionErrorDialog(
+                    stackTrace = error,
+                    retryFunction = { loadingTrigger = !loadingTrigger }
+                )
+            }
         }
 
         AnimatedVisibility(
@@ -347,7 +405,10 @@ fun CourseScreen() {
 
                     // Course info
                     item(key = "info") {
-                        CourseInfoContainer(course.info.toImmutableMap())
+                        CourseInfoContainer(
+                            courseInfo = course.info.toImmutableMap(),
+                            fromSemesterCode = fromSemesterCode
+                        )
                     }
 
                     // Sections
@@ -465,7 +526,8 @@ fun CourseAttribute(
 // Surface containing course info of a course
 @Composable
 fun CourseInfoContainer(
-    courseInfo: ImmutableMap<String, String>
+    courseInfo: ImmutableMap<String, String>,
+    fromSemesterCode: String
 ) {
     Surface(
         modifier = Modifier
@@ -482,14 +544,61 @@ fun CourseInfoContainer(
             ) {
                 courseInfo.map { info ->
                     Column {
+                        // Course info name
                         Text(
                             text = info.key,
                             color = MaterialTheme.colorScheme.secondary,
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium
                         )
+
+                        // Course info content
+//                        Text(
+//                            text = info.value,
+//                            style = MaterialTheme.typography.bodySmall
+//                        )
+
+                        // Link to courses mentioned in course info
+                        val infoCourseCodeRegex: Regex = Regex("[A-Z]{4} \\d{4}[A-Z]?")
+                        val infoCourseCodeMatches: ImmutableList<String> = infoCourseCodeRegex.findAll(info.value)
+                            .map { x -> x.value }
+                            .toImmutableList()
+                        val infoSurroundingTexts: ImmutableList<String> = info.value
+                            .split(infoCourseCodeRegex)
+                            .toImmutableList()
+
                         Text(
-                            text = info.value,
+                            text = buildAnnotatedString {
+                                val context = LocalContext.current
+
+                                // Add surrounding text, then link, vice versa
+                                infoCourseCodeMatches.mapIndexed { idx, courseCode ->
+                                    append(infoSurroundingTexts[idx])
+                                    withLink(
+                                        LinkAnnotation.Clickable(
+                                            tag = courseCode,
+                                            styles = TextLinkStyles(
+                                                style = SpanStyle(
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                    textDecoration = TextDecoration.Underline
+                                                )
+                                            )
+                                        ) {
+                                            val courseCodeLinkIntent = Intent(context, CourseScreenActivity::class.java)
+                                            courseCodeLinkIntent.putExtra("prefixName", courseCode.substring(0, 4))
+                                            courseCodeLinkIntent.putExtra("prefixType", "")  // Prefix type not needed
+                                            courseCodeLinkIntent.putExtra("code", courseCode.substring(5))
+                                            courseCodeLinkIntent.putExtra("semesterCode", fromSemesterCode)
+                                            context.startActivity(courseCodeLinkIntent)
+                                        }
+                                    ) {
+                                        append(courseCode)
+                                    }
+                                }
+
+                                // Add last surrounding text
+                                append(infoSurroundingTexts[infoSurroundingTexts.size - 1])
+                            },
                             style = MaterialTheme.typography.bodySmall
                         )
                     }
@@ -508,6 +617,6 @@ fun CourseInfoContainer(
 @Composable
 fun CourseInfoPreview() {
     USThongTheme {
-        CourseInfoContainer(sampleCourses[0].info.toImmutableMap())
+        CourseInfoContainer(sampleCourses[0].info.toImmutableMap(), "2440")
     }
 }
