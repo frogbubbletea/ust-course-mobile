@@ -18,8 +18,8 @@ android {
         applicationId = "com.frogbubbletea.ustcoursemobile"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "0.3.0-alpha"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -32,6 +32,8 @@ android {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("debug")
+
+            isDebuggable = false
         }
     }
     compileOptions {
