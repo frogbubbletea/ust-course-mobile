@@ -62,6 +62,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -291,6 +292,15 @@ fun CourseScreen() {
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    // Semester and credits
+                    item(key = "semCred") {
+                        Text(
+                            text = "${course.semester.name} • ${course.units} units",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
                     // Course title
                     item(key = "title") {
                         SelectionContainer {
@@ -480,7 +490,7 @@ fun CourseInfoContainer(
                         )
                         Text(
                             text = info.value,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
