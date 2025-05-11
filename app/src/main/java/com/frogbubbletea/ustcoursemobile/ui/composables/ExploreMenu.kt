@@ -22,13 +22,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.frogbubbletea.ustcoursemobile.data.Prefix
 import com.frogbubbletea.ustcoursemobile.data.Semester
+import kotlinx.collections.immutable.ImmutableList
 
 // Bottom sheet navigation menu
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExploreMenu(
-    semesters: List<Semester>,
-    prefixes: List<Prefix>,
+    semesters: ImmutableList<Semester>,
+    prefixes: ImmutableList<Prefix>,
     selectedSem: Semester,
     selectedPrefix: Prefix,
     onSelectStarred: () -> Unit = { },

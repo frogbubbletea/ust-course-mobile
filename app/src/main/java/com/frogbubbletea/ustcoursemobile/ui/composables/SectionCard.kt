@@ -48,6 +48,8 @@ import com.frogbubbletea.ustcoursemobile.data.Section
 import com.frogbubbletea.ustcoursemobile.data.SectionSchedule
 import com.frogbubbletea.ustcoursemobile.data.sampleCourses
 import com.frogbubbletea.ustcoursemobile.ui.theme.USThongTheme
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
 // Schedule and quota of 1 section
@@ -139,7 +141,7 @@ fun SectionCard(
 
             if (scheduleSheetExpanded) {
                 ScheduleSelectionMenu(
-                    schedules = section.schedules,
+                    schedules = section.schedules.toImmutableList(),
                     selectedScheduleIndex = selectedScheduleIndex,
                     onSelectSchedule = { i ->
                         selectedScheduleIndex = i
@@ -166,7 +168,7 @@ fun SectionCard(
             // Quotas
             SectionQuotas(
                 totalQuotas = section.totalQuota,
-                reservedQuotas = section.reservedQuotas
+                reservedQuotas = section.reservedQuotas.toImmutableList()
             )
         }
     }
@@ -201,7 +203,7 @@ fun RemarksRow(
 fun ScheduleSelectionMenu(
     // TODO: Add parameter to make it accept list of schedules
 //    schedules: List<String> = listOf("02-NOV-2024 - 02-NOV-2024", "02-NOV-2024 - 02-NOV-2024", "16-NOV-2024 - 16-NOV-2024", "16-NOV-2024 - 16-NOV-2024", "30-NOV-2024 - 30-NOV-2024")
-    schedules: List<SectionSchedule>,
+    schedules: ImmutableList<SectionSchedule>,
     selectedScheduleIndex: Int,
     onSelectSchedule: (Int) -> Unit = { },
     onDismissRequest: () -> Unit = { },
@@ -335,7 +337,7 @@ fun SectionScheduleRow(
 fun SectionQuotas(
     // TODO: Add parameter to make it accept quota data (total and reserved)
     totalQuotas: Quota,
-    reservedQuotas: List<ReservedQuota>
+    reservedQuotas: ImmutableList<ReservedQuota>
 ) {
     val totalQuotasRow: List<Int> = listOf(totalQuotas.quota, totalQuotas.enrol, totalQuotas.avail, totalQuotas.wait)
     val quotaHeadings: List<String> = listOf("Quota", "Enrol", "Avail", "Wait")

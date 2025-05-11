@@ -15,12 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.frogbubbletea.ustcoursemobile.data.Course
+import kotlinx.collections.immutable.ImmutableList
 
 // Format a list of courses into a `LazyColumn` of  `CourseCard`s
 @Composable
 fun CourseList(
     innerPadding: PaddingValues,
-    courses: List<Course>,
+    courses: ImmutableList<Course>,
     listState: LazyListState = rememberLazyListState()
 ) {
     LazyColumn(

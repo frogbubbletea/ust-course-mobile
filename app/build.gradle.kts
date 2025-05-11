@@ -6,6 +6,8 @@ plugins {
     kotlin("plugin.serialization") version "2.0.21"
 
     id("kotlin-parcelize")
+
+    id("dev.shreyaspatil.compose-compiler-report-generator") version "1.4.2"
 }
 
 android {
@@ -83,4 +85,6 @@ dependencies {
     implementation("com.fleeksoft.ksoup:ksoup-network:0.2.2")
 
     implementation("androidx.compose.runtime:runtime-tracing")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.8")
 }

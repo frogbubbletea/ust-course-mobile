@@ -1,5 +1,6 @@
 package com.frogbubbletea.ustcoursemobile.network
 
+import androidx.compose.runtime.Immutable
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.network.parseGetRequest
 import com.fleeksoft.ksoup.nodes.Document
@@ -16,6 +17,7 @@ import com.frogbubbletea.ustcoursemobile.data.SectionSchedule
 import com.frogbubbletea.ustcoursemobile.data.Semester
 import java.util.Locale
 
+@Immutable
 data class ScrapeResult(
     val scrapedPrefix: Prefix,
     val scrapedSemester: Semester,

@@ -79,6 +79,8 @@ import com.frogbubbletea.ustcoursemobile.ui.composables.ConnectionErrorDialog
 import com.frogbubbletea.ustcoursemobile.ui.composables.LoadingIndicatorBox
 import com.frogbubbletea.ustcoursemobile.ui.composables.SectionCard
 import com.frogbubbletea.ustcoursemobile.ui.theme.USThongTheme
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.toImmutableMap
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -335,7 +337,7 @@ fun CourseScreen() {
 
                     // Course info
                     item(key = "info") {
-                        CourseInfoContainer(course.info)
+                        CourseInfoContainer(course.info.toImmutableMap())
                     }
 
                     // Sections
@@ -453,7 +455,7 @@ fun CourseAttribute(
 // Surface containing course info of a course
 @Composable
 fun CourseInfoContainer(
-    courseInfo: Map<String, String>
+    courseInfo: ImmutableMap<String, String>
 ) {
     Surface(
         modifier = Modifier
@@ -496,6 +498,6 @@ fun CourseInfoContainer(
 @Composable
 fun CourseInfoPreview() {
     USThongTheme {
-        CourseInfoContainer(sampleCourses[0].info)
+        CourseInfoContainer(sampleCourses[0].info.toImmutableMap())
     }
 }

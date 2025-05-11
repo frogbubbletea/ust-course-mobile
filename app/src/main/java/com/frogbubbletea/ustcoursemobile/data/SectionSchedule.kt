@@ -1,8 +1,10 @@
 package com.frogbubbletea.ustcoursemobile.data
 
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
 
+@Immutable
 @Parcelize
 data class SectionSchedule(
     val effectivePeriod: String,  // 24-OCT-2023 - 28-NOV-2023

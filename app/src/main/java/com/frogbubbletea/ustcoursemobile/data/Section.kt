@@ -1,8 +1,10 @@
 package com.frogbubbletea.ustcoursemobile.data
 
 import android.os.Parcelable
+import androidx.compose.runtime.Immutable
 import kotlinx.parcelize.Parcelize
 
+@Immutable
 @Parcelize
 data class Section(
     val code: String,  // L1

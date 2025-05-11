@@ -74,6 +74,7 @@ import com.frogbubbletea.ustcoursemobile.ui.composables.CourseList
 import com.frogbubbletea.ustcoursemobile.ui.composables.ExploreMenu
 import com.frogbubbletea.ustcoursemobile.ui.composables.LoadingIndicatorBox
 import com.frogbubbletea.ustcoursemobile.ui.theme.USThongTheme
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
 // Shows all courses under a certain prefix
@@ -252,8 +253,8 @@ fun PrefixScreen() {
         // Explore menu
         if (showExploreMenu) {
             ExploreMenu(
-                semesters = semesters,
-                prefixes = prefixes,
+                semesters = semesters.toImmutableList(),
+                prefixes = prefixes.toImmutableList(),
                 selectedSem = selectedSemester,
                 selectedPrefix = selectedPrefix,
                 onSelectStarred = {
@@ -352,7 +353,7 @@ fun PrefixScreen() {
             ) {
                 CourseList(
                     innerPadding = innerPadding,
-                    courses = courses,
+                    courses = courses.toImmutableList(),
                     listState = courseListState
                 )
             }

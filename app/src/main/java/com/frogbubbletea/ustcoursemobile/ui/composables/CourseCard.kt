@@ -49,6 +49,7 @@ import com.frogbubbletea.ustcoursemobile.R
 import com.frogbubbletea.ustcoursemobile.data.Course
 import com.frogbubbletea.ustcoursemobile.data.sampleCourses
 import com.frogbubbletea.ustcoursemobile.ui.theme.USThongTheme
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
 // Card showing info of a course
@@ -60,7 +61,7 @@ fun CourseCard(
     course: Course
 ) {
     // Variables for section selection bottom sheet
-    val sections = course.sections
+    val sections = course.sections.toImmutableList()
     val sectionSheetState = rememberModalBottomSheetState()
     val sectionSheetScope = rememberCoroutineScope()
     var showSectionSheet by remember { mutableStateOf(false) }

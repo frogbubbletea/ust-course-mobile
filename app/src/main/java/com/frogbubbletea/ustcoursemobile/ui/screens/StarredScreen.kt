@@ -26,6 +26,7 @@ import com.frogbubbletea.ustcoursemobile.R
 import com.frogbubbletea.ustcoursemobile.data.sampleCourses
 import com.frogbubbletea.ustcoursemobile.ui.composables.CourseList
 import com.frogbubbletea.ustcoursemobile.ui.theme.USThongTheme
+import kotlinx.collections.immutable.toImmutableList
 
 // Shows all courses starred by the user
 @OptIn(ExperimentalMaterial3Api::class)
@@ -104,7 +105,7 @@ fun StarredScreen() {
     ) { innerPadding ->
         CourseList(
             innerPadding = innerPadding,
-            courses = courses
+            courses = courses.toImmutableList()
         )
     }
 }
