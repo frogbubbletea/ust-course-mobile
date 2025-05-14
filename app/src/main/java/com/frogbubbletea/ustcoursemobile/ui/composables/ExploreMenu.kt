@@ -81,7 +81,7 @@ fun ExploreMenu(
             item(key = "semesters") {
                 Text(
                     text = "Semesters",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                 )
@@ -122,7 +122,7 @@ fun ExploreMenu(
             item(key = "prefixes") {
                 Text(
                     text = "Prefixes",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
                 )

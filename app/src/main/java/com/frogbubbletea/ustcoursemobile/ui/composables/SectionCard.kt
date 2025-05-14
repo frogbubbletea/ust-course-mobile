@@ -245,12 +245,22 @@ fun ScheduleSelectionMenu(
                         color = if (i == selectedScheduleIndex) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent,
                         onClick = { onSelectSchedule(i) }
                     ) {
-                        Text(
-                            text = schedules[i].effectivePeriod,
+                        Column(
                             modifier = Modifier
-                                .padding(horizontal = 32.dp, vertical = 12.dp),
-                            color = if (i == selectedScheduleIndex) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface
-                        )
+                                .padding(horizontal = 32.dp, vertical = 12.dp)
+                        ) {
+                            // Effective period
+                            Text(
+                                text = schedules[i].effectivePeriod,
+                                color = if (i == selectedScheduleIndex) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurface
+                            )
+                            // Schedule
+                            Text(
+                                text = schedules[i].dateTimes,
+                                style = MaterialTheme.typography.labelMedium,
+                                color = if (i == selectedScheduleIndex) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }
