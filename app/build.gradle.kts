@@ -89,4 +89,6 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-tracing")
 
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.8")
+
+    implementation("androidx.compose.material3:material3:1.4.0-alpha14")
 }
