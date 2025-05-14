@@ -515,7 +515,7 @@ fun CourseAttribute(
         ) {
             Text(
                 text = short,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.labelMedium,
 //                fontWeight = FontWeight.Medium,
                 color = attrTextColor
             )

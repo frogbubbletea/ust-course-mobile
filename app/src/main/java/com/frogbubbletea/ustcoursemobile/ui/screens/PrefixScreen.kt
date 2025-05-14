@@ -209,7 +209,8 @@ fun PrefixScreen() {
                                 // Semester
                                 Text(
                                     text = selectedSemester.name,
-                                    style = MaterialTheme.typography.bodySmall
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                             Icon(

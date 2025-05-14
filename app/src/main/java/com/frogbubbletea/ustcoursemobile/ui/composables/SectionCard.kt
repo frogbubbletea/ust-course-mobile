@@ -126,7 +126,7 @@ fun SectionCard(
                     ) {
                         Text(
                             text = section.schedules[selectedScheduleIndex].effectivePeriod,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
                         Icon(
@@ -190,7 +190,7 @@ fun RemarksRow(
     ) {
         Text(
             text = short,
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onTertiaryContainer,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
         )
