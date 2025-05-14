@@ -43,6 +43,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.LoadingIndicator
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -213,7 +214,8 @@ fun PrefixScreen() {
                                 // Semester
                                 Text(
                                     text = selectedSemester.name,
-                                    style = MaterialTheme.typography.bodySmall
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                             Icon(
@@ -347,11 +349,19 @@ fun PrefixScreen() {
                 onRefresh = { loadingTrigger = !loadingTrigger },
                 state = refreshState,
                 indicator = {
-                    Indicator(
+//                    Indicator(
+//                        modifier = Modifier.align(Alignment.TopCenter),
+//                        isRefreshing = scraping == ScrapingStatus.LOADING,
+//                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+//                        state = refreshState,
+//                    )
+
+                    LoadingIndicator(
                         modifier = Modifier.align(Alignment.TopCenter),
                         isRefreshing = scraping == ScrapingStatus.LOADING,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        state = refreshState,
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        state = refreshState
                     )
                 },
                 modifier = Modifier
