@@ -29,9 +29,12 @@ import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialExpressiveTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -60,6 +63,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.frogbubbletea.ustcoursemobile.R
 import com.frogbubbletea.ustcoursemobile.StarredScreenActivity
@@ -78,7 +82,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
 // Shows all courses under a certain prefix
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun PrefixScreen() {
     // Sample data
@@ -328,10 +332,12 @@ fun PrefixScreen() {
         AnimatedVisibility(
             visible = (scraping == ScrapingStatus.SUCCESS),
             enter = slideInVertically(
-                initialOffsetY = { 120 }
+                animationSpec = MotionScheme.expressive().defaultSpatialSpec(),
+                initialOffsetY = { 300 }
             ) + fadeIn(),
             exit = slideOutVertically(
-                targetOffsetY = { 120 }
+                animationSpec = MotionScheme.expressive().defaultSpatialSpec(),
+                targetOffsetY = { 300 }
             ) + fadeOut()
         ) {
             val refreshState = rememberPullToRefreshState()

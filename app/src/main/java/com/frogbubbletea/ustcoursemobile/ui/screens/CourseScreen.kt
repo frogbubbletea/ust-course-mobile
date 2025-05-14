@@ -31,10 +31,12 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MotionScheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -93,7 +95,7 @@ import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CourseScreen() {
     // Get course from the screen that launched this activity
@@ -320,10 +322,12 @@ fun CourseScreen() {
         AnimatedVisibility(
             visible = (scrapingStatus == ScrapingStatus.SUCCESS),
             enter = slideInVertically(
-                initialOffsetY = { 120 }
+                animationSpec = MotionScheme.expressive().defaultSpatialSpec(),
+                initialOffsetY = { 300 }
             ) + fadeIn(),
             exit = slideOutVertically(
-                targetOffsetY = { 120 }
+                animationSpec = MotionScheme.expressive().defaultSpatialSpec(),
+                targetOffsetY = { 300 }
             ) + fadeOut()
         ) {
             val refreshState = rememberPullToRefreshState()
