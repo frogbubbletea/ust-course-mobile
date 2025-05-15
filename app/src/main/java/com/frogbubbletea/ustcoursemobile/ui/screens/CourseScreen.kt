@@ -61,6 +61,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -239,14 +240,14 @@ fun CourseScreen() {
                 actions = {
                     // Star button
                     // TODO: Implement course starring function
-//                    IconButton(
-//                        onClick = { }
-//                    ) {
-//                        Icon(
-//                            painter = painterResource(R.drawable.material_icon_star),
-//                            contentDescription = stringResource(id = R.string.star_icon_desc)
-//                        )
-//                    }
+                    IconButton(
+                        onClick = { }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.material_icon_star),
+                            contentDescription = stringResource(id = R.string.star_icon_desc)
+                        )
+                    }
 
                     // Dropdown menu button
                     ExternalLinksDropdown(

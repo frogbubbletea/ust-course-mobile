@@ -331,18 +331,18 @@ fun CourseCard(
 
                     // Star button
                     // TODO: Implement course starring function
-//                    IconButton(
-//                        modifier = Modifier.
-//                        then(Modifier.size(28.dp)),
-//                        onClick = { }
-//                    ) {
-//                        Icon(
-//                            painter = painterResource(R.drawable.material_icon_star),
-//                            contentDescription = stringResource(id = R.string.star_icon_desc),
-//                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-//                            modifier = Modifier.size(24.dp)
-//                        )
-//                    }
+                    IconButton(
+                        modifier = Modifier.
+                        then(Modifier.size(28.dp)),
+                        onClick = { }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.material_icon_star),
+                            contentDescription = stringResource(id = R.string.star_icon_desc),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
 
                     // Open in Class Schedule & Quota button
                     IconButton(
