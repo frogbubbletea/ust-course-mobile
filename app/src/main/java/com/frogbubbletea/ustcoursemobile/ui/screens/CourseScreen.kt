@@ -362,10 +362,10 @@ fun CourseScreen(
         AnimatedVisibility(
             visible = (scrapingStatus == ScrapingStatus.SUCCESS),
             enter = slideInVertically(
-                initialOffsetY = { 120 }
+                initialOffsetY = { 200 }
             ) + fadeIn(),
             exit = slideOutVertically(
-                targetOffsetY = { 120 }
+                targetOffsetY = { 200 }
             ) + fadeOut()
         ) {
             val refreshState = rememberPullToRefreshState()
