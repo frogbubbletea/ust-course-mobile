@@ -22,6 +22,7 @@ import kotlinx.collections.immutable.ImmutableList
 fun CourseList(
     innerPadding: PaddingValues,
     courses: ImmutableList<Course>,
+    showSemester: Boolean = false,
     listState: LazyListState = rememberLazyListState()
 ) {
     LazyColumn(
@@ -34,10 +35,11 @@ fun CourseList(
     ) {
         items(
             items = courses,
-            key = { it.code }
+            key = { it.prefix.name + it.code + it.semester.code.toString() }
         ) { course ->
             CourseCard(
                 course = course,
+                showSemester = showSemester
             )
         }
 

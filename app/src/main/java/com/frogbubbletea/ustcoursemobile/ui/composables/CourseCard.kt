@@ -27,6 +27,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,9 +45,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.frogbubbletea.ustcoursemobile.CourseScreenActivity
 import com.frogbubbletea.ustcoursemobile.R
 import com.frogbubbletea.ustcoursemobile.data.Course
+import com.frogbubbletea.ustcoursemobile.data.StarredViewModel
 import com.frogbubbletea.ustcoursemobile.data.sampleCourses
 import com.frogbubbletea.ustcoursemobile.ui.theme.USThongTheme
 import kotlinx.collections.immutable.toImmutableList
@@ -58,7 +61,9 @@ import kotlinx.coroutines.launch
 )
 @Composable
 fun CourseCard(
-    course: Course
+    course: Course,
+    showSemester: Boolean = false,
+    viewModel: StarredViewModel = hiltViewModel()
 ) {
     // Variables for section selection bottom sheet
     val sections = course.sections.toImmutableList()
@@ -72,6 +77,10 @@ fun CourseCard(
     }
 
     val context = LocalContext.current
+
+    // Starred courses
+    val starredCourses by viewModel.getStarredCourses().collectAsState(initial = emptyList())
+    val coroutineScope = rememberCoroutineScope()
 
     // Handle external links
     val uriHandler = LocalUriHandler.current
@@ -96,6 +105,15 @@ fun CourseCard(
             modifier = Modifier
                 .padding(16.dp)
         ) {
+            // Semester
+            if (showSemester) {
+                Text(
+                    text = course.semester.name,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+            }
             // Course code
             Text(
                 text = "${course.prefix.name} ${course.code}",
@@ -331,17 +349,49 @@ fun CourseCard(
 
                     // Star button
                     // TODO: Implement course starring function
-                    IconButton(
-                        modifier = Modifier.
-                        then(Modifier.size(28.dp)),
-                        onClick = { }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.material_icon_star),
-                            contentDescription = stringResource(id = R.string.star_icon_desc),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(24.dp)
-                        )
+                    // Show different icons and actions when course is starred or not
+                    if (starredCourses.filter { x -> x.id == course.prefix.name + course.code + course.semester.code.toString() }.isEmpty()) {
+                        IconButton(
+                            modifier = Modifier.
+                            then(Modifier.size(28.dp)),
+                            onClick = { coroutineScope.launch {
+                                viewModel.starCourse(
+                                    prefixName = course.prefix.name,
+                                    prefixType = course.prefix.type.toString(),
+                                    code = course.code,
+                                    semCode = course.semester.code,
+                                    semName = course.semester.name
+                                )
+                            } }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.material_icon_star),
+                                contentDescription = stringResource(id = R.string.star_icon_desc),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                    } else {
+                        IconButton(
+                            modifier = Modifier.
+                            then(Modifier.size(28.dp)),
+                            onClick = { coroutineScope.launch {
+                                viewModel.unstarCourse(
+                                    prefixName = course.prefix.name,
+                                    prefixType = course.prefix.type.toString(),
+                                    code = course.code,
+                                    semCode = course.semester.code,
+                                    semName = course.semester.name
+                                )
+                            } }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.material_icon_star_filled),
+                                contentDescription = stringResource(id = R.string.star_icon_desc),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     }
 
                     // Open in Class Schedule & Quota button

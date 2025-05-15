@@ -27,8 +27,10 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,24 +41,31 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.frogbubbletea.ustcoursemobile.R
 import com.frogbubbletea.ustcoursemobile.data.Course
+import com.frogbubbletea.ustcoursemobile.data.CourseEntity
 import com.frogbubbletea.ustcoursemobile.data.Prefix
 import com.frogbubbletea.ustcoursemobile.data.PrefixType
 import com.frogbubbletea.ustcoursemobile.data.Semester
+import com.frogbubbletea.ustcoursemobile.data.StarredViewModel
 import com.frogbubbletea.ustcoursemobile.data.sampleCourses
+import com.frogbubbletea.ustcoursemobile.data.semesterCodeToInstance
 import com.frogbubbletea.ustcoursemobile.network.ScrapingStatus
 import com.frogbubbletea.ustcoursemobile.network.scrapeCourses
 import com.frogbubbletea.ustcoursemobile.ui.composables.ConnectionErrorDialog
 import com.frogbubbletea.ustcoursemobile.ui.composables.CourseList
 import com.frogbubbletea.ustcoursemobile.ui.composables.LoadingIndicatorBox
 import com.frogbubbletea.ustcoursemobile.ui.theme.USThongTheme
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 
 // Shows all courses starred by the user
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StarredScreen() {
+fun StarredScreen(
+    viewModel: StarredViewModel = hiltViewModel()
+) {
     val activity = LocalActivity.current
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
@@ -83,29 +92,63 @@ fun StarredScreen() {
         )
     ) }
 
+    // Starred courses
+    val starredCourses by viewModel.getStarredCourses().collectAsState(initial = emptyList())
+    val coroutineScope = rememberCoroutineScope()
+
     // Load course data
     var loadingTrigger by rememberSaveable { mutableStateOf(false) }
     var scraping by rememberSaveable { mutableStateOf(ScrapingStatus.LOADING) }
-
-    LaunchedEffect(loadingTrigger) {
+    var starredCourseObjects: List<Course> by rememberSaveable { mutableStateOf(listOf()) }
+    LaunchedEffect(loadingTrigger, starredCourses) {
         scraping = ScrapingStatus.LOADING
 
         try {
+            // Iterate over unique semesters and prefixes
+            val starredCoursesMap = starredCourses.groupBy { Pair(it.semCode, it.prefixName) }
+
+            starredCourseObjects = starredCoursesMap.map { entry ->
+                // Perform course data scraping
+                val scrapeResult = scrapeCourses(
+                    prefix = Prefix(entry.key.second, PrefixType.UNDEFINED),
+                    semester = semesterCodeToInstance(entry.key.first)
+                )
+
+                // Unpack scraped data
+                prefixes = scrapeResult.prefixes
+                semesters = scrapeResult.semesters
+                courses = scrapeResult.courses
+
+                // Find starred courses from scraped data
+                scrapeResult.courses
+                    .filter { course ->
+                        CourseEntity(
+                            id = course.prefix.name + course.code + course.semester.code.toString(),
+                            prefixName = course.prefix.name,
+                            prefixType = course.prefix.type.toString(),
+                            code = course.code,
+                            semCode = course.semester.code,
+                            semName = course.semester.name
+                        ) in entry.value
+                    }
+                    .toImmutableList()
+            }.flatten().sortedWith(compareBy({ it.prefix.name }, { it.code }, { -it.semester.code }))
+
             // Perform course data scraping
-            val scrapeResult = scrapeCourses(
-                prefix = if (selectedPrefix.name == "") null else selectedPrefix,
-                semester = if (selectedSemester.code == 0) null else selectedSemester
-            )
-
-            // Unpack scraped data
-            prefixes = scrapeResult.prefixes
-            semesters = scrapeResult.semesters
-            courses = scrapeResult.courses
-
-
-            // Assign first prefix and latest semester after initial scrape
-            selectedPrefix = scrapeResult.scrapedPrefix
-            selectedSemester = scrapeResult.scrapedSemester
+//            val scrapeResult = scrapeCourses(
+//                prefix = if (selectedPrefix.name == "") null else selectedPrefix,
+//                semester = if (selectedSemester.code == 0) null else selectedSemester
+//            )
+//
+//            // Unpack scraped data
+//            prefixes = scrapeResult.prefixes
+//            semesters = scrapeResult.semesters
+//            courses = scrapeResult.courses
+//
+//
+//            // Assign first prefix and latest semester after initial scrape
+//            selectedPrefix = scrapeResult.scrapedPrefix
+//            selectedSemester = scrapeResult.scrapedSemester
 
             scraping = ScrapingStatus.SUCCESS
         } catch (e: Exception) {
@@ -216,7 +259,8 @@ fun StarredScreen() {
             ) {
                 CourseList(
                     innerPadding = innerPadding,
-                    courses = courses.toImmutableList()
+                    courses = starredCourseObjects.toImmutableList(),
+                    showSemester = true
                 )
             }
         }

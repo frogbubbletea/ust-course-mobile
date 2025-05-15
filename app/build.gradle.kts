@@ -8,6 +8,13 @@ plugins {
     id("kotlin-parcelize")
 
     id("dev.shreyaspatil.compose-compiler-report-generator") version "1.4.2"
+//
+//    id("com.google.devtools.ksp")
+//
+//    id("com.google.dagger.hilt.android")
+
+    alias(libs.plugins.google.ksp)
+    alias(libs.plugins.android.hilt)
 }
 
 android {
@@ -89,4 +96,20 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-tracing")
 
     implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.8")
+
+//    val room_version = "2.7.1"
+//
+//    implementation("androidx.room:room-runtime:$room_version")
+//
+//    ksp("androidx.room:room-compiler:$room_version")
+//
+//    implementation("com.google.dagger:hilt-android:2.56.2")
+//
+//    ksp("com.google.dagger:hilt-android-compiler:2.56.2")
+
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.bundles.hilt)
+    implementation(libs.bundles.room)
+    ksp(libs.bundles.hilt.ksp)
+    ksp(libs.androidx.room.compiler)
 }

@@ -50,9 +50,11 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -74,6 +76,7 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.frogbubbletea.ustcoursemobile.CourseScreenActivity
 import com.frogbubbletea.ustcoursemobile.R
 import com.frogbubbletea.ustcoursemobile.data.Course
@@ -81,6 +84,7 @@ import com.frogbubbletea.ustcoursemobile.data.MatchingRequirement
 import com.frogbubbletea.ustcoursemobile.data.Prefix
 import com.frogbubbletea.ustcoursemobile.data.PrefixType
 import com.frogbubbletea.ustcoursemobile.data.Semester
+import com.frogbubbletea.ustcoursemobile.data.StarredViewModel
 import com.frogbubbletea.ustcoursemobile.data.sampleCourses
 import com.frogbubbletea.ustcoursemobile.data.semesterCodeToInstance
 import com.frogbubbletea.ustcoursemobile.network.ScrapeResult
@@ -95,10 +99,13 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CourseScreen() {
+fun CourseScreen(
+    viewModel: StarredViewModel = hiltViewModel()
+) {
     // Get course from the screen that launched this activity
     val activity = LocalActivity.current
     val intent = activity?.intent
@@ -136,6 +143,10 @@ fun CourseScreen() {
         )
     ) }
     var error: String by rememberSaveable { mutableStateOf("") }  // Error message
+
+    // Starred courses
+    val starredCourses by viewModel.getStarredCourses().collectAsState(initial = emptyList())
+    val coroutineScope = rememberCoroutineScope()
 
     // Set top bar to collapse when scrolled down
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
@@ -240,13 +251,41 @@ fun CourseScreen() {
                 actions = {
                     // Star button
                     // TODO: Implement course starring function
-                    IconButton(
-                        onClick = { }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.material_icon_star),
-                            contentDescription = stringResource(id = R.string.star_icon_desc)
-                        )
+                    // Show different icons and actions when course is starred or not
+                    if (starredCourses.filter { x -> x.id == course.prefix.name + course.code + course.semester.code.toString() }.isEmpty()) {
+                        IconButton(
+                            onClick = { coroutineScope.launch {
+                                viewModel.starCourse(
+                                    prefixName = course.prefix.name,
+                                    prefixType = course.prefix.type.toString(),
+                                    code = course.code,
+                                    semCode = course.semester.code,
+                                    semName = course.semester.name
+                                )
+                            } }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.material_icon_star),
+                                contentDescription = stringResource(id = R.string.star_icon_desc)
+                            )
+                        }
+                    } else {
+                        IconButton(
+                            onClick = { coroutineScope.launch {
+                                viewModel.unstarCourse(
+                                    prefixName = course.prefix.name,
+                                    prefixType = course.prefix.type.toString(),
+                                    code = course.code,
+                                    semCode = course.semester.code,
+                                    semName = course.semester.name
+                                )
+                            } }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.material_icon_star_filled),
+                                contentDescription = stringResource(id = R.string.star_icon_desc)
+                            )
+                        }
                     }
 
                     // Dropdown menu button
