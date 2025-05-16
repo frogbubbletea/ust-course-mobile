@@ -337,10 +337,10 @@ fun PrefixScreen(
         AnimatedVisibility(
             visible = (scraping == ScrapingStatus.SUCCESS),
             enter = slideInVertically(
-                initialOffsetY = { 200 }
+                initialOffsetY = { 120 }
             ) + fadeIn(),
             exit = slideOutVertically(
-                targetOffsetY = { 200 }
+                targetOffsetY = { 120 }
             ) + fadeOut()
         ) {
             val refreshState = rememberPullToRefreshState()

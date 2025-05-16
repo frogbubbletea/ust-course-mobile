@@ -16,4 +16,5 @@
     <string name="explore_icon_desc">Semesters and prefixes</string>
     <string name="back_icon_desc">Back</string>
     <string name="error_icon_desc">Error</string>
+    <string name="info_icon_desc">Info</string>
 </resources>
