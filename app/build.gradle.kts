@@ -112,4 +112,13 @@ dependencies {
     implementation(libs.bundles.room)
     ksp(libs.bundles.hilt.ksp)
     ksp(libs.androidx.room.compiler)
+
+    // For AppWidgets support
+    implementation("androidx.glance:glance-appwidget:1.1.1")
+
+    // For interop APIs with Material 3
+    implementation("androidx.glance:glance-material3:1.1.1")
+
+    // For interop APIs with Material 2
+    implementation("androidx.glance:glance-material:1.1.1")
 }
