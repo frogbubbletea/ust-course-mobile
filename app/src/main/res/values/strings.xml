@@ -20,4 +20,5 @@
     <string name="prev_icon_desc">Previous</string>
     <string name="next_icon_desc">Next</string>
     <string name="semester_icon_desc">Semester</string>
+    <string name="refresh_icon_desc">Refresh</string>
 </resources>

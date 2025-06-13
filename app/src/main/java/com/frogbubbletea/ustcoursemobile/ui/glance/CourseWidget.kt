@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -20,6 +21,7 @@ import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.LocalSize
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.SizeMode
@@ -166,7 +168,7 @@ class CourseWidget : GlanceAppWidget() {
                                 style = bodyLarge.copy(color = GlanceTheme.colors.primary)
                             )
 
-                            // Section flip buttons (Width >= 4)
+                            // Section flip and refresh buttons (Width >= 4)
                             if (size.width >= FOUR_TWO.width) {
                                 Row(
                                     horizontalAlignment = Alignment.End,
@@ -185,6 +187,15 @@ class CourseWidget : GlanceAppWidget() {
                                     CircleIconButton(
                                         imageProvider = ImageProvider(R.drawable.material_icon_next),
                                         contentDescription = context.getString(R.string.next_icon_desc),
+                                        onClick = { },
+                                        modifier = GlanceModifier.size(24.dp),
+                                        backgroundColor = null
+                                    )
+                                    Spacer(modifier = GlanceModifier.width(8.dp))
+                                    // Refresh
+                                    CircleIconButton(
+                                        imageProvider = ImageProvider(R.drawable.material_icon_refresh),
+                                        contentDescription = context.getString(R.string.refresh_icon_desc),
                                         onClick = { },
                                         modifier = GlanceModifier.size(24.dp),
                                         backgroundColor = null
@@ -297,13 +308,15 @@ class CourseWidget : GlanceAppWidget() {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Image(
-                                provider = ImageProvider(R.drawable.material_icon_semester),
-                                contentDescription = context.getString(R.string.semester_icon_desc),
-                                modifier = GlanceModifier.size(16.dp),
-                                colorFilter = tint(GlanceTheme.colors.onSurfaceVariant)
-                            )
-                            Spacer(modifier = GlanceModifier.width(4.dp))
+                            if (size.width >= THREE_TWO.width) {
+                                Image(
+                                    provider = ImageProvider(R.drawable.material_icon_semester),
+                                    contentDescription = context.getString(R.string.semester_icon_desc),
+                                    modifier = GlanceModifier.size(16.dp),
+                                    colorFilter = tint(GlanceTheme.colors.onSurfaceVariant)
+                                )
+                                Spacer(modifier = GlanceModifier.width(4.dp))
+                            }
                             Text(
                                 text = "${semesterYear}Summer",
                                 style = labelMedium.copy(color = GlanceTheme.colors.onSurfaceVariant)
@@ -331,28 +344,40 @@ class CourseWidget : GlanceAppWidget() {
                             }
                         }
 
-                        // Section flip buttons (Width 2)
+                        // Section flip and refresh buttons (Width 2)
                         if (size.width < FOUR_TWO.width) {
                             Row(
                                 horizontalAlignment = Alignment.End,
                                 modifier = GlanceModifier.fillMaxWidth()
                             ) {
                                 // Prev button
-                                CircleIconButton(
-                                    imageProvider = ImageProvider(R.drawable.material_icon_prev),
+                                Image(
+                                    provider = ImageProvider(R.drawable.material_icon_prev),
                                     contentDescription = context.getString(R.string.prev_icon_desc),
-                                    onClick = { },
-                                    modifier = GlanceModifier.size(16.dp),
-                                    backgroundColor = null
+                                    modifier = GlanceModifier
+                                        .size(16.dp)
+                                        .clickable({ }),
+                                    colorFilter = tint(GlanceTheme.colors.onSurfaceVariant)
                                 )
-                                Spacer(modifier = GlanceModifier.width(8.dp))
+                                Spacer(modifier = GlanceModifier.width(4.dp))
                                 // Next button
-                                CircleIconButton(
-                                    imageProvider = ImageProvider(R.drawable.material_icon_next),
+                                Image(
+                                    provider = ImageProvider(R.drawable.material_icon_next),
                                     contentDescription = context.getString(R.string.next_icon_desc),
-                                    onClick = { },
-                                    modifier = GlanceModifier.size(16.dp),
-                                    backgroundColor = null
+                                    modifier = GlanceModifier
+                                        .size(16.dp)
+                                        .clickable({ }),
+                                    colorFilter = tint(GlanceTheme.colors.onSurfaceVariant)
+                                )
+                                Spacer(modifier = GlanceModifier.width(4.dp))
+                                // Refresh button
+                                Image(
+                                    provider = ImageProvider(R.drawable.material_icon_refresh),
+                                    contentDescription = context.getString(R.string.refresh_icon_desc),
+                                    modifier = GlanceModifier
+                                        .size(16.dp)
+                                        .clickable({ }),
+                                    colorFilter = tint(GlanceTheme.colors.onSurfaceVariant)
                                 )
                             }
                         }
