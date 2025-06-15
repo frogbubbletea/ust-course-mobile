@@ -297,9 +297,8 @@ class CourseWidget : GlanceAppWidget() {
                     verticalAlignment = Alignment.Bottom,
                     modifier = GlanceModifier.fillMaxSize()
                 ) {
-                    // Display sections and units label if widget width >= 4
+                    // Display sections label if widget width >= 4
                     val semesterYear = if (size.width >= FOUR_TWO.width) "2024-25 " else ""
-                    val unitsLabel = if (size.width >= FOUR_TWO.width) " units" else ""
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
@@ -323,7 +322,7 @@ class CourseWidget : GlanceAppWidget() {
                             )
                         }
 
-                        if (size.width >= THREE_TWO.width) {
+                        if (size.width >= FOUR_TWO.width) {
                             Spacer(modifier = GlanceModifier.width(8.dp))
 
                             // Number of units
@@ -338,7 +337,7 @@ class CourseWidget : GlanceAppWidget() {
                                 )
                                 Spacer(modifier = GlanceModifier.width(4.dp))
                                 Text(
-                                    text = "3${unitsLabel}",
+                                    text = "3 units",
                                     style = labelMedium.copy(color = GlanceTheme.colors.onSurfaceVariant)
                                 )
                             }
