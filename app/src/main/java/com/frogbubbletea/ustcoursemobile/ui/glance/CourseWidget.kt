@@ -1,6 +1,7 @@
 package com.frogbubbletea.ustcoursemobile.ui.glance
 
 import android.content.Context
+import android.content.Intent
 import androidx.collection.intFloatMapOf
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +26,7 @@ import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.SizeMode
+import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.components.CircleIconButton
 import androidx.glance.appwidget.components.Scaffold
 import androidx.glance.appwidget.lazy.LazyColumn
@@ -43,6 +45,7 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import com.frogbubbletea.ustcoursemobile.CourseScreenActivity
 import com.frogbubbletea.ustcoursemobile.R
 
 class CourseWidgetReceiver : GlanceAppWidgetReceiver() {
@@ -123,6 +126,13 @@ class CourseWidget : GlanceAppWidget() {
             fontWeight = FontWeight.Medium
         )
 
+        // Intent to launch course screen from widget
+        val courseWidgetIntent = Intent(context, CourseScreenActivity::class.java)
+        courseWidgetIntent.putExtra("prefixName", "COMP")
+        courseWidgetIntent.putExtra("prefixType", "UG")
+        courseWidgetIntent.putExtra("code", "1021")
+        courseWidgetIntent.putExtra("semesterCode", "2440")
+
         Column(
             modifier = GlanceModifier
                 .background(GlanceTheme.colors.widgetBackground)
@@ -136,7 +146,10 @@ class CourseWidget : GlanceAppWidget() {
                 item(itemId = 1) {
                     Text(
                         text = "LANG 2030H",
-                        style = if (size.width >= FOUR_TWO.width) titleLarge else titleMedium
+                        style = if (size.width >= FOUR_TWO.width) titleLarge else titleMedium,
+                        modifier = GlanceModifier
+                            .fillMaxWidth()
+                            .clickable(actionStartActivity(courseWidgetIntent))
                     )
                 }
 
@@ -146,7 +159,10 @@ class CourseWidget : GlanceAppWidget() {
                         Text(
                             text = "Professional Development in Ethics, Innovation and Technology for Research Postgraduate Students",
                             style = bodyMedium,
-                            maxLines = 1
+                            maxLines = 1,
+                            modifier = GlanceModifier
+                                .fillMaxWidth()
+                                .clickable(actionStartActivity(courseWidgetIntent))
                         )
                     }
                 }
