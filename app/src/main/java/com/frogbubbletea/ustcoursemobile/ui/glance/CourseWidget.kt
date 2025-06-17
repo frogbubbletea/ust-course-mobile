@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,6 +49,8 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import com.frogbubbletea.ustcoursemobile.CourseScreenActivity
 import com.frogbubbletea.ustcoursemobile.R
+import com.frogbubbletea.ustcoursemobile.data.glanceData.WidgetSectionEntity
+import com.frogbubbletea.ustcoursemobile.data.glanceData.WidgetSectionRepository
 
 class CourseWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = CourseWidget()
@@ -77,15 +81,37 @@ class CourseWidget : GlanceAppWidget() {
     )
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val repo = WidgetSectionRepository.get(context)
         provideContent {
             GlanceTheme {
-                MyContent(context)
+                MyContent(context, repo)
             }
         }
     }
 
     @Composable
-    private fun MyContent(context: Context) {
+    private fun MyContent(context: Context, repo: WidgetSectionRepository) {
+        // Get sections
+        val sectionsState = repo.loadSections().collectAsState(initial = emptyList())
+        val sections = sectionsState.value
+        // TODO: Get page number from preferences datastore
+        val pageNumber = 0
+        // Get section to be displayed in the widget
+        val sectionToDisplay = sections.getOrElse(
+            pageNumber,
+            {
+                WidgetSectionEntity(
+                    classNbr = 0,
+                    sectionCode = "",
+                    quota = 0,
+                    enrol = 0,
+                    avail = 0,
+                    wait = 0,
+                    hasReserved = false
+                )
+            }
+        )
+
         // Get current widget size
         val size = LocalSize.current
 
@@ -130,8 +156,8 @@ class CourseWidget : GlanceAppWidget() {
         val courseWidgetIntent = Intent(context, CourseScreenActivity::class.java)
         courseWidgetIntent.putExtra("prefixName", "COMP")
         courseWidgetIntent.putExtra("prefixType", "UG")
-        courseWidgetIntent.putExtra("code", "1021")
-        courseWidgetIntent.putExtra("semesterCode", "2440")
+        courseWidgetIntent.putExtra("code", "2011")
+        courseWidgetIntent.putExtra("semesterCode", "2430")
 
         Column(
             modifier = GlanceModifier
@@ -180,7 +206,8 @@ class CourseWidget : GlanceAppWidget() {
                         ) {
                             // Display of selected section
                             Text(
-                                text = "T04C (3554)",
+                                text = "${sectionToDisplay.sectionCode} (${sectionToDisplay.classNbr})",
+//                                text = "L2 (2043)",
                                 style = bodyLarge.copy(color = GlanceTheme.colors.primary)
                             )
 
@@ -228,7 +255,7 @@ class CourseWidget : GlanceAppWidget() {
 
                 // Quota of one selected section (total)
                 val quotaHeadings = listOf("Quota", "Enrol", "Avail", "Wait")
-                val quotaValues = listOf(400, 200, 200, 223)
+                val quotaValues = listOf(sectionToDisplay.quota, sectionToDisplay.enrol, sectionToDisplay.avail, sectionToDisplay.wait)
 
                 // Display quotas in 1 row if wide enough, 2 rows otherwise
                 if (size.width >= FOUR_TWO.width) {
