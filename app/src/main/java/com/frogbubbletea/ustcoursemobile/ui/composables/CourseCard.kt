@@ -311,7 +311,6 @@ fun CourseCard(
                             Text(
                                 text = if (sections.size == 1) "${sections.size} section" else "${sections.size} sections",
                                 style = MaterialTheme.typography.labelMedium,
-//                                fontWeight = FontWeight.Medium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }

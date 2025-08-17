@@ -306,47 +306,10 @@ fun CourseScreen(
         }
     ) { innerPadding ->
         if (scrapingStatus == ScrapingStatus.LOADING) {
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(innerPadding)
-//            ) {
-//                Box(
-//                    contentAlignment = Alignment.TopCenter,
-//                    modifier = Modifier
-//                        .fillMaxSize()
-//                        .padding(16.dp)
-//                ) {
-//                    CircularProgressIndicator(
-//                        modifier = Modifier
-//                            .width(24.dp),
-//                    )
-//                }
-//            }
-
             LoadingIndicatorBox(innerPadding)
         }
 
         if (scrapingStatus == ScrapingStatus.ERROR) {
-//            LazyColumn(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//                    .padding(innerPadding)
-//            ) {
-//                item {
-//                    Text(fromPrefix.toString())
-//                }
-//                item {
-//                    Text(fromCode)
-//                }
-//                item {
-//                    Text(fromSemester.toString())
-//                }
-//                item {
-//                    Text(error)
-//                }
-//            }
-
             when (error) {
                 "courseNotFound" -> CourseNotFoundDialog(
                     courseCode = fromPrefix.name + fromCode,
@@ -386,19 +349,9 @@ fun CourseScreen(
                     .padding(innerPadding)
             ) {
                 LazyColumn(
-//                    modifier = Modifier.padding(innerPadding),
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    // Semester and credits
-                    item(key = "semCred") {
-                        Text(
-                            text = "${course.semester.name} • ${course.units} units",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-
                     // Course title
                     item(key = "title") {
                         SelectionContainer {
@@ -407,6 +360,15 @@ fun CourseScreen(
                                 style = MaterialTheme.typography.titleLarge
                             )
                         }
+                    }
+
+                    // Semester and credits
+                    item(key = "semCred") {
+                        Text(
+                            text = "${course.semester.name} • ${course.units} units",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
 
                     // Course attributes
